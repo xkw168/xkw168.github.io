@@ -1,1 +1,26 @@
-theme: jekyll-theme-cayman
+# Site settings
+name: xkw的个人小屋
+email: xiakewei96@qq.com
+author: xkw
+url: http://www.xkw168.github.io
+resume_site: http://www.xkw168.github.io
+github: https://github.com/xkw168/
+baseurl: ""
+description: Actually, less is more!
+meta_description: 个人博客;学而不思则罔;思而不学则殆;生命不止;折腾不休
+motto: It's our wits that make us men.
+banner: 学而不思则罔，思而不学则殆。
+
+#permalink: /:categories/:year/:month/:day/:title/
+permalink: /:year/:month/:day/:title/
+paginate: 10
+
+exclude: ['README.md', 'Gemfile.lock', 'Gemfile', 'Rakefile']
+
+github_username: xkw168
+
+# Build settings
+markdown: kramdown
+
+baidu_analysis: 
+
