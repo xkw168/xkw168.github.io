@@ -1,9 +1,9 @@
 ---
 layout: post
 title:  "Chrome 73安装crx插件"
-date:   2019-05-21
-categories: 技术
-tag: 技术
+date:   2019-03-23
+categories: 其他
+tag: 小技巧
 ---
 
 * content
