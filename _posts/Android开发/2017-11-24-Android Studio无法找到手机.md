@@ -3,7 +3,7 @@ layout: post
 title:  "Android Studio无法找到手机"
 date:   2017-11-24
 categories: 其他
-tag: 小技巧
+tag: 奇技淫巧
 ---
 
 * content

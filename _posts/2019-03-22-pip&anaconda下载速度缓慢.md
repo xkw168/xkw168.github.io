@@ -3,7 +3,7 @@ layout: post
 title:  "pip / anaconda修改下载源提高下载速度"
 date:   2019-03-22
 categories: Python
-tag: 小技巧
+tag: 奇技淫巧
 ---
 
 * content
