@@ -480,7 +480,7 @@ a {
       .g-footer section a:hover {
         color: #83888F; }
 
-.post-header, .markdown-body, .post-wrapper, .author-detail, .social-share-wrapper {
+.post-header, .markdown-body, .post-wrapper, .author-detail, .social-share-wrapper, .read-analysis {
   margin: 0 auto; }
 
 .post-wrapper {
@@ -641,6 +641,23 @@ a {
   .social-share-wrapper .social-share {
     position: relative;
     left: -50%; }
+
+.read-analysis {
+  float: right;
+  position: relative;
+  left: 50%; }
+
+  .caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 2px;
+    vertical-align: middle;
+    border-top: 4px solid #000000;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    border-bottom: 0 dotted;
+  }
 
 .post-footer-item {
   margin: 0 auto;
