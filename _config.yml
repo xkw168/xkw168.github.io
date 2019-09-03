@@ -19,7 +19,7 @@ baseurl: ''
 nav:
   home: '/'
   tags: '/tags.html'
-  cv: '/cv.html'
+  resume: '/resume.html'
 
 # Footer
 footer:
