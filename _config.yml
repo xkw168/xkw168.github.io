@@ -1,6 +1,6 @@
 # Site settings 配置站点
 title: '夏可为的博客小屋'
-description: '很高兴能在这里见到你，我叫夏可为，昵称苍狼，90后，热爱技术，一个想当极客当不了极客的极客~'
+description: '很高兴能在这里见到你，我叫夏可为，昵称苍狼，90后，热爱技术，一个努力朝极客方向发展的极客~'
 keyword: '夏可为, 夏可为的博客，徐柯欣'
 url: 'https://xkw168.github.io/' # your host
 
@@ -15,9 +15,11 @@ url: 'https://xkw168.github.io/' # your host
 baseurl: ''
 
 # Navigation links
+# if you want to create new page, create here
 nav:
   home: '/'
   tags: '/tags.html'
+  cv: '/cv.html'
 
 # Footer
 footer:
@@ -56,12 +58,12 @@ postPatterns: 'circuitBoard'
 # SNS settings 配置社交网站
 # url: email, weibo, zhihu, twitter, instagram, juejin, github, douban, facebook, dribble, uicn, jianshu, medium, linkedin
 sns:
-  weibo: '//weibo.com/xkw168'
-  zhihu: '//www.zhihu.com/people/cang-lang-31-81-99/activities'
-  # juejin: '//juejin.im/user/57a6f434165abd006159b4cc'
+  # weibo: '//weibo.com/xkw168'
+  # zhihu: '//www.zhihu.com/people/cang-lang-31-81-99/activities'
   instagram: '//www.instagram.com/xkw168'
   github: '//github.com/xkw168'
-
+  linkedin: '//www.linkedin.com/in/kewei-xia-a7166a177/'
+  facebook: '//www.facebook.com/kewei.xia.14'
 
 
 # Tags 设置标签
