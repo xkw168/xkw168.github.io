@@ -52,18 +52,18 @@ valgrind实际上是一系列工具的集合，在这里我们主要关注其中
 
 如果你使用valgrind运行你的程序，你应该期待得到以下的输出：
 
-![expected output](../img/valgrind_expected_output.png)
+![expected output](/img/valgrind_expected_output.png)
 
 * All heap blocks were freed -- no leaks are possible（没有内存泄漏，所有空间都已正确释放）
 * ERROR SUMMARY: 0 errors from 0 contexts（程序没有错误）
 
 **常见错误**
 
-![uninitalized_value](../img/uninitalized_value.png)
+![uninitalized_value](/img/uninitalized_value.png)
 
 * 有时候你会（不经意间）使用到一些未初始化的变量(尤其是你使用`malloc`的时候， 如`char * str = malloc(cnt * sizeof(* str))`，这会使得你得到的指针指向一个未初始化的内存，相应的你应该使用 `calloc`, `char * str = calloc(cnt * sizeof(* str))`)
 
-![invalidate_read/write](../img/invalidate_readwrite.png)
+![invalidate_read/write](/img/invalidate_readwrite.png)
 
 * 有时候你会（不经意间）访问到一下不应该访问的内存（常由于数组越界导致）
 

@@ -51,18 +51,18 @@ Simply run your program with valgrind command with the argument your program nee
 
 if you run the command above, you should expect the following output, says:
 
-![expected output](../img/valgrind_expected_output.png)
+![expected output](/img/valgrind_expected_output.png)
 
 * All heap blocks were freed -- no leaks are possible
 * ERROR SUMMARY: 0 errors from 0 contexts
 
 **What's the typical error?**
 
-![uninitalized_value](../img/uninitalized_value.png)
+![uninitalized_value](/img/uninitalized_value.png)
 
 * Sometimes you just use some uninitialised value(especially you are using malloc)(e.g. `char * str = malloc(cnt * sizeof(* str))`, this will leave the pointer str you created uninitialised, instead you should use `calloc`, `char * str = calloc(cnt * sizeof(* str))`)
 
-![invalidate_read/write](../img/invalidate_readwrite.png)
+![invalidate_read/write](/img/invalidate_readwrite.png)
 
 * Sometimes you may access some memory you are not suppose to access, for example
 
