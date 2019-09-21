@@ -1,17 +1,19 @@
 ﻿---
 layout: post
-title:  "Emacs, Makefile and Valgrind"
-date:   2019-09-01
+title:  "Emacs, Makefile and Valrgrind"
+date:   2019-09-02
 categories: Coding
-tag: Editor
+tag: 奇技淫巧
 ---
 
 * content
 {:toc}
 
-## Emacs Introduction
+## Emacs 快捷键
 
-Some common keyboard shortcut of emacs are listed below:
+&emsp;&emsp;最近由于课程要求，不得不开始学习Emacs的使用，开个博客记录一下Emacs痛苦的入门之路，简单记录一下常用的快捷键。持续更新ing...
+
+注：关于Emacs和Vim的区别，[这里](https://mp.weixin.qq.com/s/KTaEuy7kfm7t1bwQmvE32Q)有一篇很好的文章
 
 |                            Command                            | Shortcut |
 |:-------------------------------------------------------------:|:--------:|
@@ -28,8 +30,7 @@ Some common keyboard shortcut of emacs are listed below:
 | Paste                                                         | C-y      |
 | Page down(up)                                                 | C-v(M-v) |
 
-
-Search word in Emacs:
+搜索的功能相信是很多人日常的需求，Emacs当中，我们可以使用内置的isearch进行搜索：
 
 |                    Command                    |                       Shortcut                       |
 |:---------------------------------------------:|:----------------------------------------------------:|
@@ -39,32 +40,32 @@ Search word in Emacs:
 | Exit and place the cursor at origin position  |                          C-g                         |
 | Exit and place the cursor at current position |                         Enter                        |
 
-## Valgrind Introduction
+## Valgrind 简介
 
-Valgrind is actually a collection of tools, which are designed so that more can be added if desired. In here, we more focused on the *Memcheck* tool, which allowed us to check whether our program has some memory leak(e.g. caused by malloc but no free, dangle pointer...)
+valgrind实际上是一系列工具的集合，在这里我们主要关注其中的**内存检查**工具，可以让我们检查程序是否存在内存泄露的问题（如：malloc分配了内存但是没有free，空指针...）
 
-**How to use?**
+**如何使用？**
 
-Simply run your program with valgrind command with the argument your program need `valgrind ./myProgram hello 42`
+简单的使用valgrind指令来运行你的程序就好`valgrind ./myProgram hello 42`
 
-**What to expect**
+**期待输出**
 
-if you run the command above, you should expect the following output, says:
+如果你使用valgrind运行你的程序，你应该期待得到以下的输出：
 
 ![expected output](/img/valgrind_expected_output.png)
 
-* All heap blocks were freed -- no leaks are possible
-* ERROR SUMMARY: 0 errors from 0 contexts
+* All heap blocks were freed -- no leaks are possible（没有内存泄漏，所有空间都已正确释放）
+* ERROR SUMMARY: 0 errors from 0 contexts（程序没有错误）
 
-**What's the typical error?**
+**常见错误**
 
 ![uninitalized_value](/img/uninitalized_value.png)
 
-* Sometimes you just use some uninitialised value(especially you are using malloc)(e.g. `char * str = malloc(cnt * sizeof(* str))`, this will leave the pointer str you created uninitialised, instead you should use `calloc`, `char * str = calloc(cnt * sizeof(* str))`)
+* 有时候你会（不经意间）使用到一些未初始化的变量(尤其是你使用`malloc`的时候， 如`char * str = malloc(cnt * sizeof(* str))`，这会使得你得到的指针指向一个未初始化的内存，相应的你应该使用 `calloc`, `char * str = calloc(cnt * sizeof(* str))`)
 
 ![invalidate_read/write](/img/invalidate_readwrite.png)
 
-* Sometimes you may access some memory you are not suppose to access, for example
+* 有时候你会（不经意间）访问到一下不应该访问的内存（常由于数组越界导致）
 
 ```C
 char * str1 = "Hello World";
@@ -72,20 +73,20 @@ char * str2 = calloc(cnt * sizeof(* str2));
 strcpy(str2, str1);
 ```
 
-note that `strcpy` will add a `\0` at the end of the string, so you should allocate len + 1 size of memory
+注意 `strcpy` 会在字符串的结尾自动添加 `\0` ， 所以分配内存的时候，你需要为结束符多分配一个内存空间
 
-**Useful command**
+**常用指令**
 
 ```shell
 valgrind --track-origins=yes --leak-check=full ./myProgram
 ```
 
-* `--track-origins=yes` tells the valgrind to track exactly where each error happen
-* `--leak-check=full` tells the valgrind to show exactly where each memory leak error happen
+* `--track-origins=yes` 告诉valgrind显示导致每一个错误发生的具体代码位置
+* `--leak-check=full` 告诉valgrind显示每一个内存泄漏的具体信息（由什么导致，在哪里发生）
 
-## MakeFile Introduction
+## MakeFile 简介
 
-for C, we use `gcc` to compile
+在 C 里面，我们使用 `gcc` 进行编译
 
 ```make
 CFLAGS=-std=gnu99 -pedantic -Wall -Werror -ggdb3
@@ -99,7 +100,8 @@ clean:
 	rm -r rand_story *.o *~
 ```
 
-for C++, we use `g++` to compile
+在 C++ 里面，我们使用 `g++` 进行编译
+
 ```make
 CFLAGS= -pedantic -Wall -Werror -ggdb3
 all: code.o
