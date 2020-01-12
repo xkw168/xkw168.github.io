@@ -1,4 +1,4 @@
-﻿---
+---
 layout: post
 title:  "Emacs, Makefile and Valgrind"
 date:   2019-09-01

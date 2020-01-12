@@ -1,4 +1,4 @@
-﻿---
+---
 layout: post
 title:  "RS触发器、RS锁存器、D触发器"
 date:   2019-09-21
@@ -11,7 +11,7 @@ tag: 专业内容
 ## RS锁存器（RS latch）
 
 电路图：
-![SR_latch](/img/dlatch_dff/SR_latch.png)
+![SR_latch](./img/dlatch_dff/SR_latch.png)
 
 真值表：
 
@@ -43,6 +43,6 @@ tag: 专业内容
 ## D触发器（D flip flop）
 
 电路图：
-![DFF](/img/dlatch_dff/dff.png)
+![DFF](./img/dlatch_dff/dff.png)
 
 通过两个D锁存器级联，并加入一个非门，就形成了**D触发器**。通过非门，使得两个D锁存器的时钟存在一个180°的相位差（亦即是相差半个时钟周期），从而实现，只在时钟上升沿的时候读取输入并输出，所以其他时候输入的变化不会传导到输出端，去除了输入可能存在的毛刺，得到了稳定的输出。

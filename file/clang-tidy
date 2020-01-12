@@ -1,0 +1,36 @@
+Checks:          'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-alpha*,cert-env33-c,cert-err52-cpp,readability-braces-around-statements,readability-function-size,misc-definitions-in-headers,misc-macro-parentheses,misc-macro-repeated-side-effects,misc-non-copyable-objects,misc-pointer-and-integral-operation,misc-redundant-expression,misc-sizeof-expression,misc-suspicious-semicolon,misc-suspicious-string-compare,cert-err60-cpp,cppcoreguidelines-pro-type-member-init,google-build-using-namespace,google-explicit-constructor,google-runtime-member-string-references,misc-assign-operator-signature,misc-inaccurate-erase,misc-throw-by-value-catch-by-reference'
+HeaderFilterRegex: ''
+AnalyzeTemporaryDtors: false
+User:            adh39
+CheckOptions:    
+  - key:             google-readability-braces-around-statements.ShortStatementLines
+    value:           '1'
+  - key:             google-readability-function-size.StatementThreshold
+    value:           '40'
+  - key:             google-readability-namespace-comments.ShortNamespaceLines
+    value:           '10'
+  - key:             google-readability-namespace-comments.SpacesBeforeComments
+    value:           '2'
+  - key:             misc-definitions-in-headers.UseHeaderFileExtension
+    value:           '1'
+  - key:             modernize-loop-convert.MaxCopySize
+    value:           '16'
+  - key:             modernize-loop-convert.MinConfidence
+    value:           reasonable
+  - key:             modernize-loop-convert.NamingStyle
+    value:           CamelCase
+  - key:             modernize-pass-by-value.IncludeStyle
+    value:           llvm
+  - key:             modernize-replace-auto-ptr.IncludeStyle
+    value:           llvm
+  - key:             modernize-use-nullptr.NullMacros
+    value:           'NULL'
+  - key:             readability-braces-around-statements.ShortStatementLines
+    value:           '0'
+  - key:             readability-function-size.BranchThreshold
+    value:           '4294967295'
+  - key:             readability-function-size.LineThreshold
+    value:           '30'
+  - key:             readability-function-size.StatementThreshold
+    value:           '40'
+
