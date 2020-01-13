@@ -14,11 +14,11 @@ tag: 奇技淫巧
 
 打开Terminal，输入指令`ssh-keygen`，会询问你文件名，自己起一个名字，然后让你设置passphrase，这个是在密钥的基础上多加一重保障（设置了之后，本地使用私钥ssh登录，会要求先输入这个密码），为了方便，我们不设置这个（留空就好）
 
-![image-20200113130515987](/Users/xkw/Code/xkw168.github.io/img/ssh1.png)
+![image-20200113130515987](/img/ssh1.png)
 
 设置完成后，会出现以下界面
 
-![image-20200113130726631](/Users/xkw/Code/xkw168.github.io/img/ssh2.png)
+![image-20200113130726631](/img/ssh2.png)
 
 当前文件夹会生成test（私钥）和test.pub（公钥）两个文件
 
