@@ -94,6 +94,7 @@ urlpatterns = [
 ### 2.3 HTML模板文件
 #### 2.3.1 基础模板文件
 首先在`users`文件夹下面创建一个`templates`文件夹并在里面创建`users`文件夹，这个文件夹将会用来存放我们所有的HTML模板文件。这里为了以后能更方便的在每个页面使用Bootstrap（下一篇文章会详细讲解），我们首先新建一个`base.html`，写入如下内容：
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
