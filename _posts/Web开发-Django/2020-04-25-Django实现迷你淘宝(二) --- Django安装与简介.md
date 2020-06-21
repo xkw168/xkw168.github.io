@@ -4,6 +4,11 @@ title:  "Django实现迷你淘宝（二）--- Django安装与简介"
 date:   2020-04-25
 categories: 专业学习
 tag: Django
+---
+
+* content
+{:toc}
+
 
 ---
 

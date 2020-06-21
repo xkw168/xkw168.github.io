@@ -4,6 +4,11 @@ title:  "Django实现迷你淘宝（四）--- 基于Bootstrap的商品页面设�
 date:   2020-05-13
 categories: 专业学习
 tag: Django
+---
+
+* content
+{:toc}
+
 
 ---
 
