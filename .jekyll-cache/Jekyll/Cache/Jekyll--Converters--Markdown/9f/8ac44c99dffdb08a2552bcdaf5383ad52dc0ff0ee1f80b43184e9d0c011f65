@@ -1,0 +1,22 @@
+I"5
+<p>  相信很多人在敲完代码之后，由于种种原因需要将代码复制到word里面进行保存，但是直接复制出来的结果总是不尽人意，今天，就在这里向大家介绍一下如何利用Notepad++这一辅助工具在word里面粘贴处漂亮的代码。</p>
+
+<hr />
+
+<ol>
+  <li>把代码复制到 Notepad++，并保存为相应的格式（NotePad如何设置）</li>
+  <li>选中Notepad++文本编辑区里的代码，进入【插件】菜单，进入【NppExport】，点击【Copy all formats to clipboard】
+<img src="http://img.blog.csdn.net/20171119182629495?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQva2V3ZWkxNjg=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="Notepad" /></li>
+  <li>在word里面粘贴（ctrl+c）</li>
+  <li>在word的编辑区中选中刚粘贴过来的代码。进入【格式】菜单，点击【边框和底纹】，并在弹出的窗体中调整“边框”和“底纹”的属性。
+<img src="http://img.blog.csdn.net/20171119182655207?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQva2V3ZWkxNjg=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述" />
+<img src="http://img.blog.csdn.net/20171119182711424?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQva2V3ZWkxNjg=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述" />
+<img src="http://img.blog.csdn.net/20171119182722931?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQva2V3ZWkxNjg=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述" /></li>
+  <li>登登登，大功告成！！！
+<img src="http://img.blog.csdn.net/20171119182743816?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQva2V3ZWkxNjg=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述" /></li>
+</ol>
+
+<p>（如果Notepad++本身已经设置了底色，那么就不用在word里面再调整背景颜色啦）</p>
+
+<p>（本人小白，初次写博客，不足之处多多包涵）</p>
+:ET

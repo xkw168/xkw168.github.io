@@ -1,0 +1,439 @@
+I"�<ul id="markdown-toc">
+  <li><a href="#文章列表" id="markdown-toc-文章列表">文章列表</a></li>
+  <li><a href="#程序介绍" id="markdown-toc-程序介绍">程序介绍</a></li>
+  <li><a href="#库文件的安装与使用" id="markdown-toc-库文件的安装与使用">库文件的安装与使用</a>    <ul>
+      <li><a href="#1-flask" id="markdown-toc-1-flask">1. Flask</a>        <ul>
+          <li><a href="#一前期环境配置" id="markdown-toc-一前期环境配置">一、前期环境配置</a></li>
+          <li><a href="#二flask程序介绍" id="markdown-toc-二flask程序介绍">二、Flask程序介绍</a></li>
+        </ul>
+      </li>
+      <li><a href="#2-sqlite3简介" id="markdown-toc-2-sqlite3简介">2. sqlite3简介</a></li>
+    </ul>
+  </li>
+  <li><a href="#程序编写" id="markdown-toc-程序编写">程序编写</a></li>
+  <li><a href="#程序部署" id="markdown-toc-程序部署">程序部署</a>    <ul>
+      <li><a href="#1-安装准备" id="markdown-toc-1-安装准备">1. 安装准备</a>        <ul>
+          <li><a href="#11-安装python" id="markdown-toc-11-安装python">1.1 安装python</a></li>
+          <li><a href="#12-安装flask" id="markdown-toc-12-安装flask">1.2 安装flask</a></li>
+          <li><a href="#13-安装nginx" id="markdown-toc-13-安装nginx">1.3 安装Nginx</a></li>
+          <li><a href="#14-安装gunicorn" id="markdown-toc-14-安装gunicorn">1.4 安装gunicorn</a></li>
+        </ul>
+      </li>
+      <li><a href="#2-加载flask程序" id="markdown-toc-2-加载flask程序">2. 加载flask程序</a>        <ul>
+          <li><a href="#21-winscp" id="markdown-toc-21-winscp">2.1 WinSCP</a></li>
+          <li><a href="#22-git" id="markdown-toc-22-git">2.2 git</a></li>
+        </ul>
+      </li>
+      <li><a href="#3-运行flask程序" id="markdown-toc-3-运行flask程序">3. 运行flask程序</a></li>
+      <li><a href="#4-部署nginx反向代理" id="markdown-toc-4-部署nginx反向代理">4. 部署nginx反向代理</a></li>
+      <li><a href="#5-服务器端常用指令" id="markdown-toc-5-服务器端常用指令">5. 服务器端常用指令</a>        <ul>
+          <li><a href="#51-列出所有正在运行的端口" id="markdown-toc-51-列出所有正在运行的端口">5.1 列出所有正在运行的端口</a></li>
+          <li><a href="#52-操作文件其实可以用winscp替代" id="markdown-toc-52-操作文件其实可以用winscp替代">5.2 操作文件（其实可以用WinSCP替代）</a></li>
+          <li><a href="#53-安装文件" id="markdown-toc-53-安装文件">5.3 安装文件</a></li>
+          <li><a href="#54-重启gunicorn代码修改后需要" id="markdown-toc-54-重启gunicorn代码修改后需要">5.4 重启gunicorn（代码修改后需要）</a></li>
+          <li><a href="#55-重启nginx" id="markdown-toc-55-重启nginx">5.5 重启nginx</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="文章列表">文章列表</h2>
+
+<ol>
+  <li><a href="https://xkw168.github.io/2019/05/25/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%E8%81%94%E7%BD%91%E5%B0%8F%E7%A8%8B%E5%BA%8F-%E4%B8%80-%E5%B7%A5%E5%85%B7%E5%92%8C%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E4%BB%8B%E7%BB%8D.html">从零开始搭建一个联网Android APP（一）—— 工具和基本概念介绍</a></li>
+  <li><a href="https://xkw168.github.io/2019/05/25/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%E8%81%94%E7%BD%91%E5%B0%8F%E7%A8%8B%E5%BA%8F-%E4%BA%8C-%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AB%AF%E7%A8%8B%E5%BA%8F.html">从零开始搭建一个联网Android APP（二）—— 服务器端程序</a></li>
+  <li><a href="https://xkw168.github.io/2019/05/25/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%E8%81%94%E7%BD%91%E5%B0%8F%E7%A8%8B%E5%BA%8F-%E4%B8%89-Android%E7%AB%AF%E7%A8%8B%E5%BA%8F.html">从零开始搭建一个联网Android APP（三）—— Android端程序</a></li>
+</ol>
+
+<p>本文<a href="https://github.com/xkw168/account_book/tree/online">源码</a></p>
+
+<p>注：该工程有两个branch，master为<a href="https://github.com/xkw168/account_book/releases">离线版本</a>，所有功能集成到Android端，便于使用；online为在线版本，适合喜欢折腾的人</p>
+
+<p>注：本系列博客主要重点在于服务器端的程序开发、部署和Android端如何与服务器端通信，不涉及具体的Android开发内容。</p>
+
+<hr />
+
+<h2 id="程序介绍">程序介绍</h2>
+
+<p>  服务器端编程使用的是python语言，涉及flask和sqlite3两个库，其中flask用于构建Web程序（获得并相应用户请求GET/POST），sqlite3用于操作数据库相关的内容。</p>
+
+<hr />
+
+<h2 id="库文件的安装与使用">库文件的安装与使用</h2>
+
+<h3 id="1-flask">1. Flask</h3>
+
+<h4 id="一前期环境配置">一、前期环境配置</h4>
+
+<p>  首先选择一款你喜欢的IDE或者编辑器，python的话个人推荐<a href="https://www.jetbrains.com/pycharm/">PyCharm</a>，和Android Studio都是JetBrain出产的，界面很相似，两者直接基本无缝切换，而且也很好用。<br />
+  因为sqlite3是python自带的一款轻量级数据库，所以我们只需要安装flask即可。安装 flask 最便捷的方式是使用虚拟环境（virtual environment）。</p>
+
+<p>win+R并输入cmd打开命令提示符，利用cd指令转到工程目录，并输入</p>
+
+<p><code class="language-plaintext highlighter-rouge">virtualenv env #创建名为env的虚拟环境</code></p>
+
+<p>然后利用</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd env/Scripts
+activate #激活虚拟环境
+</code></pre></div></div>
+<p>mac下可用如下指令激活</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>source env/bin/activate
+</code></pre></div></div>
+
+<p>如下图，当命令行前面出现（env）的时候就证明虚拟环境成功激活，然后就可以在虚拟环境里面安装flask了。</p>
+
+<p><img src="https://img-blog.csdn.net/20180522103249162" alt="" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install flask #安装flask
+</code></pre></div></div>
+
+<p><img src="https://img-blog.csdn.net/20180522103309360" alt="" /></p>
+
+<p>前期的环境配置就大功告成了，然后就可以开始写代码了。</p>
+
+<h4 id="二flask程序介绍">二、Flask程序介绍</h4>
+
+<p>（1）初始化</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>（2）路由和视图函数</p>
+
+<ul>
+  <li>客户端（例如 Web 浏览器）把请求发送给 Web 服务器</li>
+  <li>Web服务器再把请求发送给 <strong>Flask程序实例</strong>app</li>
+  <li>app需要知道：对每个URL请求运行哪些代码，所以保存了一个URL到Python函数的映射关系。处理 URL 和函数之间关系的程序称为路由</li>
+</ul>
+
+<p>  在 Flask 程序中定义路由的最简便方式，是使用程序实例提供的 app.route 修饰器，把修饰的函数注册为路由。如：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span><span class="s">'Hello Flask!'</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span><span class="n">还可以在路由里面定义动态部分</span><span class="err">，</span><span class="n">如</span><span class="err">：</span>
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/&lt;name&gt;'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span><span class="s">'Hello '</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">' !'</span>
+</code></pre></div></div>
+
+<p>  尖括号中的内容就是动态部分，任何能匹配静态部分的URL都会映射到这个路由上。路由中的动态部分默认使用字符串，不过也可使用类型定义。例如，路由<code class="language-plaintext highlighter-rouge">/user/&lt;int:id&gt;</code>只会匹配动态片段id为整数的URL。Flask 支持在路由中使用int、float和path类型。（path类型也是字符串，但不把斜线视作分隔符，而将其当作动态片段的一部分）调用视图函数时，Flask会将动态部分作为参数传入函数。</p>
+
+<p>注：修饰器是Python语言的标准特性，可以使用不同的方式修改函数的行为。惯常用法是使用修饰器把函数注册为事件的处理程序</p>
+
+<p>（3）启动服务器</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>（4）把前面几节的拼起来就是一个完整的flask程序了</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span><span class="s">'Hello Flask!'</span>
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/&lt;name&gt;'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span><span class="s">'Hello '</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">' !'</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>运行后如下：</p>
+
+<p><img src="https://img-blog.csdn.net/20180522103920981" alt="" /></p>
+
+<p>浏览器访问http://127.0.0.1:5000/</p>
+
+<p><img src="https://img-blog.csdn.net/20180522103929661" alt="" /></p>
+
+<p>浏览器访问http://127.0.0.1:5000/whu</p>
+
+<p><img src="https://img-blog.csdn.net/20180522103938378" alt="" /></p>
+
+<h3 id="2-sqlite3简介">2. sqlite3简介</h3>
+
+<p>  sqlite3是一款python自带的轻量级数据库，支持传统的SQL语法。</p>
+
+<p>（1）建表</p>
+
+<p>  注意<strong>Order为SQL的关键字，所以建表的时候表名不能是Order</strong>，但是数据库文件名字可以是Order</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="s">'Order.db'</span><span class="p">);</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">conn</span><span class="p">.</span><span class="n">cursor</span><span class="p">();</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Openeddatabase successfully"</span><span class="p">);</span>
+
+<span class="n">sql</span> <span class="o">=</span> <span class="s">'''CREATE TABLE Order1
+        (ID integer PRIMARY KEY autoincrement,
+        name TEXT NOT NULL,
+        serialNumber TEXT NOT NULL,
+        creatTime TEXT NOT NULL,
+        count integer NOT NULL,
+        isFinish integer
+        );'''</span>
+<span class="n">c</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<span class="k">print</span> <span class="p">(</span><span class="s">"Tablecreated successfully"</span><span class="p">);</span>
+<span class="n">conn</span><span class="p">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="n">conn</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>  创建完之后用软件（DB Browser forSQLite）打开Order.db，可以看到成功创建了表Order1</p>
+
+<p>（2）增删改查（CRUD：creat，retrieve，update，delete）</p>
+
+<ol>
+  <li>增（关键词insert）</li>
+</ol>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sql</span> <span class="o">=</span> <span class="s">'''insert into Order1
+              (name, serialNumber, creatTime,count, isFinish)
+              values(?, ?, ?, ?, ?)'''</span>
+<span class="n">c</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">,(</span><span class="s">u'测试订单'</span><span class="p">,</span> <span class="s">'test666'</span><span class="p">,</span> <span class="s">'2018-4-2'</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="bp">False</span><span class="p">))</span>
+<span class="n">conn</span><span class="p">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="k">print</span> <span class="p">(</span><span class="s">"Records created successfully"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<ol>
+  <li>删（关键词delete）</li>
+</ol>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sql</span> <span class="o">=</span> <span class="s">"delete from Order1 where ID = 2"</span>
+<span class="n">c</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Delete recordsuccessfully'</span><span class="p">)</span>
+<span class="n">conn</span><span class="p">.</span><span class="n">commit</span><span class="p">()</span>
+</code></pre></div></div>
+
+<ol>
+  <li>改（关键词update）</li>
+</ol>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sql</span> <span class="o">=</span> <span class="s">"update Order1 set isFinish = ? where ID = ?"</span>
+<span class="n">c</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">,(</span><span class="s">'true'</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Update record succesfully'</span><span class="p">)</span>
+<span class="n">conn</span><span class="p">.</span><span class="n">commit</span><span class="p">()</span>
+</code></pre></div></div>
+
+<ol>
+  <li>查（关键词select）</li>
+</ol>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">c</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="s">'''select * from Order1 order by creatTime'''</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span><span class="n">c</span><span class="p">.</span><span class="n">fetchall</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span> 
+        <span class="k">print</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+<span class="n">conn</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+<span class="c1"># select * 表示把整张表全部查询出来
+</span></code></pre></div></div>
+
+<p>关于更多SQLite3的知识可以：点击<a href="https://www.runoob.com/sqlite/sqlite-python.html">此处</a></p>
+
+<hr />
+
+<h2 id="程序编写">程序编写</h2>
+
+<p>  综上所述，我们可以新建两个文件，分别为<code class="language-plaintext highlighter-rouge">main.py</code>和<code class="language-plaintext highlighter-rouge">sql.py</code>，其中main里面写flask的路由函数，sql里面写后端的数据库函数</p>
+
+<p>  其中一个标准的flask接口函数为</p>
+
+<p>GET模式：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/queryAllAccount/&lt;offset&gt;/&lt;limit&gt;'</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">'GET'</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">query_all_account</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">limit</span><span class="p">):</span>
+    <span class="n">accounts</span> <span class="o">=</span> <span class="n">query_all_account_info</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">offset</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">limit</span><span class="p">))</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="p">{</span><span class="s">"accounts"</span><span class="p">:</span> <span class="n">accounts</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">json_default</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>这里解释一下，<code class="language-plaintext highlighter-rouge">@app.route('/queryAllAccount/&lt;offset&gt;/&lt;limit&gt;', methods=['GET'])</code>就说明了这个接口的调用方法是GET，而且URL格式为<code class="language-plaintext highlighter-rouge">http://你的服务器地址/queryAllAccount/参数1/参数2</code>，指定参数的格式可以通过<code class="language-plaintext highlighter-rouge">&lt;int:offset&gt;</code>的形式。</p>
+
+<p>声明函数的时候，参数数量一定要和URL里面的一致且命名保持统一，随后函数内部就正常使用参数</p>
+
+<p>POST模式:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 新增订单
+</span><span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/addAccount'</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">'POST'</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">add_account</span><span class="p">():</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">form</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'content'</span><span class="p">)</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">form</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'number'</span><span class="p">)</span>
+    <span class="n">person</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">form</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'person'</span><span class="p">)</span>
+    <span class="n">create_time</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">form</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'createTime'</span><span class="p">)</span>
+
+    <span class="n">account</span> <span class="o">=</span> <span class="n">Account</span><span class="p">(</span><span class="n">account_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="n">number</span><span class="p">,</span> <span class="n">create_time</span><span class="o">=</span><span class="n">create_time</span><span class="p">,</span> <span class="n">person</span><span class="o">=</span><span class="n">person</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">add_new_account</span><span class="p">(</span><span class="n">account</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s">'statue'</span><span class="p">:</span> <span class="s">'successful'</span><span class="p">})</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s">'statue'</span><span class="p">:</span> <span class="s">'failure'</span><span class="p">})</span>
+</code></pre></div></div>
+
+<p>这里解释一下<code class="language-plaintext highlighter-rouge">@app.route('/addAccount', methods=['POST'])</code>就说明了这个接口的调用方法为POST，URL内不含参数，参数都在body内，此时函数本身也不含参数没需要在函数内部通过<code class="language-plaintext highlighter-rouge">request.form.get('参数的key')</code>的形式获得参数。（client端是以键值对的形式添加的参数）</p>
+
+<hr />
+
+<h2 id="程序部署">程序部署</h2>
+
+<p>  这里以腾讯云服务器，基于CentOS的系统为例介绍程序的部署。
+  服务器端配置使用了gunicorn和nginx，其中gunicorn用于运行Python程序，nginx用于反向代理（缓冲请求和相应）。</p>
+
+<h3 id="1-安装准备">1. 安装准备</h3>
+
+<h4 id="11-安装python">1.1 安装python</h4>
+
+<p>  注意我们使用的是python3，可以在服务器里面输入<code class="language-plaintext highlighter-rouge">python -V</code>或者<code class="language-plaintext highlighter-rouge">python --version</code>来查看python版本，很多服务器都默认安装了python2.7版本，这时候我们需要另外安装python3，这里就不详细赘述了（可以上网查找详细资料）。</p>
+
+<h4 id="12-安装flask">1.2 安装flask</h4>
+
+<ul>
+  <li>首先安装虚拟环境virtualenv（<code class="language-plaintext highlighter-rouge">pip install virtualenv</code>）（可以通过<code class="language-plaintext highlighter-rouge">pip list</code>查看可安装的内容）</li>
+  <li>然后进入工程目录并创建虚拟环境(<code class="language-plaintext highlighter-rouge">virtualenv env #创建一个名为env的虚拟环境</code>)</li>
+  <li>激活虚拟环境(<code class="language-plaintext highlighter-rouge">source env/bin/activate</code>)</li>
+  <li>安装flask(<code class="language-plaintext highlighter-rouge">pip install flask</code>)</li>
+</ul>
+
+<h4 id="13-安装nginx">1.3 安装Nginx</h4>
+
+<p>安装Nginx有两种方式可以选择：<br />
+一是直接<code class="language-plaintext highlighter-rouge">yum install nginx</code>（省事）；<br />
+二是下载Nginx的源代码在服务器端重新编译生成（虽然麻烦，但是和服务器更兼容）。</p>
+
+<p>第一种方式就是小白教程，一句指令搞定，这里就不说了。</p>
+
+<p>第二种方式可以参考这个<a href="https://blog.csdn.net/jiangeeq/article/details/70144319">博客</a>。</p>
+
+<p>  注意一下不同的安装方法对应的启动Nginx方法也不一样，通过yum install安装的可以直接使用指令<code class="language-plaintext highlighter-rouge">service nginx start</code>启动，自己编译的需要到nginx的目录下（可以使用<code class="language-plaintext highlighter-rouge">whereis nginx</code>定位目录）再<code class="language-plaintext highlighter-rouge">./nginx</code>启动。</p>
+
+<h4 id="14-安装gunicorn">1.4 安装gunicorn</h4>
+
+<p>进入工程目录，激活虚拟环境，然后</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install gunicorn
+</code></pre></div></div>
+
+<h3 id="2-加载flask程序">2. 加载flask程序</h3>
+
+<p>  有两种方法可以将本地的python（flask）程序上传至云端。</p>
+
+<ul>
+  <li>
+    <p>方案一：使用WinSCP直接把.py文件拷贝到服务器对应位置</p>
+  </li>
+  <li>
+    <p>方案二：利用git</p>
+  </li>
+</ul>
+
+<p>下面分别介绍这两种方法（假设云端的工程路径为root/test）：</p>
+
+<h4 id="21-winscp">2.1 WinSCP</h4>
+
+<p><img src="https://img-blog.csdn.net/20180522142358719" alt="" /></p>
+
+<p>  打开WinSCP，文件协议选择SFTP，主机名输入云端服务器的公网IP地址（注意一定要是公网），端口号选择22，用户名和密码不同服务器的默认用户名不同（也可以根据自己需要新建一个用户）。</p>
+
+<p><img src="https://img-blog.csdn.net/20180522142415461" alt="" /></p>
+
+<p>  成功登陆远程服务器之后找到对应的工程目录，左边是我们电脑的本地文件，右边是服务器的文件。直接把.py文件拖拽至右端即可。(FileZilla使用方式类似)</p>
+
+<h4 id="22-git">2.2 git</h4>
+
+<p>服务器一般都安装好了git，我们可以直接使用git进行版本管理。</p>
+
+<p>在本地电脑开发好之后，push上去，然后登录服务器pull下来。</p>
+
+<p>如果不会使用git，可以参考该<a href="https://www.liaoxuefeng.com/wiki/896043488029600">博客</a>。</p>
+
+<h3 id="3-运行flask程序">3. 运行flask程序</h3>
+
+<p>  先进入工程所在目录，再使用以下指令运行代码。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gunicorn <span class="nt">-D</span> <span class="nt">-w</span> 4 <span class="nt">-b</span> localhost:8080 HelloFlask:app
+</code></pre></div></div>
+
+<p>说明：</p>
+
+<p>-D：表示后台运行</p>
+
+<p>-w 4：表示开启四个线程（效率会高一点，可以根据自己服务器情况决定）</p>
+
+<p>-b localhost:8080：表示ip和端口，这里采用本机访问，方便nginx代理</p>
+
+<p>最后面的HelloFlask表示程序名称，app为全局变量<code class="language-plaintext highlighter-rouge">app = Flask(__name__)</code></p>
+
+<p>  启动完后，可以通过指令<code class="language-plaintext highlighter-rouge">pstree -ap|grep gunicorn</code>查看gunicorn树。可以看到，成功开启了四个线程，主线程号为11027。至此，我们的代码已经在服务器上面愉快的跑起来了。</p>
+
+<p><img src="https://img-blog.csdn.net/2018052214251618" alt="" /></p>
+
+<p>  现在用浏览器测试一下，会发现显示找不到网页，因为此时我们的程序只在服务器的本地上运行（前面写了运行在本地端口），所以在其他机器是无法访问的，这时候就需要nginx进行一个请求的转发。</p>
+
+<h3 id="4-部署nginx反向代理">4. 部署nginx反向代理</h3>
+
+<p>  安装完nginx之后，到<code class="language-plaintext highlighter-rouge">user/local/nginx/conf</code>路径下，找到<code class="language-plaintext highlighter-rouge">nginx.conf</code>文件，修改其中的配置信息。（可以直接在服务器修改，也可以使用前面介绍的方法先下载到本地修改完后再同步到服务器端）<br />
+  这里我采用下载到本地修改。找到关键代码段，这里的意思就是监听80端口，并将80端口的请求转发给8080端口（也就是我们前面gunicorn运行的那个端口）。listen填写要监听的端口号（Http协议默认为80，也可以填写其他端口，但是主要需要去<strong>腾讯云-控制台-安全组</strong>，开放对应的端口），server_name填写服务器的公网IP，proxy_pass填写上一步gunicorn运行的地址。</p>
+
+<p><img src="https://img-blog.csdn.net/20180522142603428" alt="" /></p>
+
+<p>配置好之后，启动nginx，浏览器访问服务器地址，可以发现已经成功了。</p>
+
+<h3 id="5-服务器端常用指令">5. 服务器端常用指令</h3>
+
+<h4 id="51-列出所有正在运行的端口">5.1 列出所有正在运行的端口</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>netstat -ntlp
+</code></pre></div></div>
+
+<p><img src="https://img-blog.csdn.net/20180522142642784" alt="" /></p>
+
+<p>可以看到端口80由nginx监听，端口8080是我们的python程序</p>
+
+<h4 id="52-操作文件其实可以用winscp替代">5.2 操作文件（其实可以用WinSCP替代）</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir dir1 创建 'dir1' 目录
+rm -f file1 删除 'file1'
+rm -rf dir1 删除 'dir1' 目录及其子目录内容
+</code></pre></div></div>
+
+<h4 id="53-安装文件">5.3 安装文件</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum install ***
+</code></pre></div></div>
+
+<h4 id="54-重启gunicorn代码修改后需要">5.4 重启gunicorn（代码修改后需要）</h4>
+
+<p>首先<code class="language-plaintext highlighter-rouge">pstree -ap|grep gunicorn</code>查看gunicorn树</p>
+
+<p>然后<code class="language-plaintext highlighter-rouge">kill -HUP 6264</code>即可关闭gunicorn（6264为gunicorn的主进程号）</p>
+
+<p>最后<code class="language-plaintext highlighter-rouge">gunicorn -D -w 4 -b 127.0.0.1:8080 HelloFlask:app</code>重新运行程序</p>
+
+<h4 id="55-重启nginx">5.5 重启nginx</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/usr/local/nginx/sbin -s stop
+/usr/local/nginx/sbin/nginx
+</code></pre></div></div>
+
+<p>（不行的话<code class="language-plaintext highlighter-rouge">ps -ef|grep nginx</code>看线程，然后<code class="language-plaintext highlighter-rouge">kill -HUP</code> 主进程号强制关闭）</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kill -HUP 主进程号（平滑重启）
+
+kill -QUIT 主进程号（从容停止）
+
+kill -TERM 主进程号（快速停止）
+</code></pre></div></div>
+
+<hr />
+
+<p>  至此，服务器端代码的编写和部署就叙述完毕了，大家可以根据自己的需要进行修改。</p>
+:ET

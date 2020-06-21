@@ -1,0 +1,31 @@
+I"�<ul id="markdown-toc">
+  <li><a href="#问题描述" id="markdown-toc-问题描述">问题描述</a></li>
+  <li><a href="#解决方案" id="markdown-toc-解决方案">解决方案</a></li>
+</ul>
+
+<h2 id="问题描述">问题描述</h2>
+
+<hr />
+
+<p>  有时候TextView要显示的内容较多，但是TextView的大小有限，那么就不得不使用滚动模式。
+　　</p>
+<h2 id="解决方案">解决方案</h2>
+
+<hr />
+
+<p>  在布局文件里面为TextView添加以下属性</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>android:scrollbars="vertical" //这里用于设置滑动的方向
+android:scrollbarStyle="outsideOverlay"
+android:scrollbarFadeDuration="200" //用于设置右手边的滑动进度条显示的时间，单位ms
+</code></pre></div></div>
+
+<p>  并在Activity里面调用TextView的setMovementMethod（）函数</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mDataField</span> <span class="o">=</span> <span class="o">(</span><span class="nc">TextView</span><span class="o">)</span><span class="n">findViewById</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">textView_data</span><span class="o">);</span>
+<span class="n">mDataField</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">mData</span><span class="o">);</span>
+<span class="n">mDataField</span><span class="o">.</span><span class="na">setMovementMethod</span><span class="o">(</span><span class="nc">ScrollingMovementMethod</span><span class="o">.</span><span class="na">getInstance</span><span class="o">());</span>
+</code></pre></div></div>
+
+<p>  其实在布局文件里面设置的属性都是用于控制滚动效果的，只要调用了setMovementMethod（）函数就可以实现滚动显示了。</p>
+:ET

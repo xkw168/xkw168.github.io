@@ -1,0 +1,80 @@
+I"_ <ul id="markdown-toc">
+  <li><a href="#动态加载布局margin属性无效" id="markdown-toc-动态加载布局margin属性无效">动态加载布局，margin属性无效</a></li>
+</ul>
+
+<h2 id="动态加载布局margin属性无效">动态加载布局，margin属性无效</h2>
+<p>  有时候我们写好了一个布局文件的模板，然后在代码里面利用LayoutInflate进行动态加载的时候，我们会发现模板里面原来写好的margin的一些参数全都不起作用，下面举一个例子，比如说我的模板文件如下</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="nt">&lt;RelativeLayout</span>
+    <span class="na">xmlns:android=</span><span class="s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="na">android:layout_width=</span><span class="s">"match_parent"</span>
+    <span class="na">android:layout_height=</span><span class="s">"40dp"</span>
+    <span class="na">android:layout_marginStart=</span><span class="s">"20dp"</span>
+    <span class="na">android:layout_marginEnd=</span><span class="s">"20dp"</span>
+    <span class="na">android:layout_marginTop=</span><span class="s">"10dp"</span>
+    <span class="na">android:background=</span><span class="s">"@drawable/item_unselected"</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;TextView</span>
+        <span class="na">android:id=</span><span class="s">"@+id/reminder_entity_content"</span>
+        <span class="na">android:layout_width=</span><span class="s">"match_parent"</span>
+        <span class="na">android:layout_height=</span><span class="s">"match_parent"</span>
+        <span class="na">android:layout_alignParentStart=</span><span class="s">"true"</span>
+        <span class="na">android:layout_marginStart=</span><span class="s">"@dimen/activity_horizontal_margin"</span>
+        <span class="na">android:text=</span><span class="s">"Bring Utensil"</span>
+        <span class="na">android:textColor=</span><span class="s">"@color/text_black_high"</span>
+        <span class="na">android:textSize=</span><span class="s">"@dimen/shortcut_detail_text_size_small"</span>
+        <span class="na">android:gravity=</span><span class="s">"center_vertical"</span><span class="nt">/&gt;</span>
+
+    <span class="nt">&lt;ImageView</span>
+        <span class="na">android:id=</span><span class="s">"@+id/reminder_action_where"</span>
+        <span class="na">android:layout_width=</span><span class="s">"@dimen/medium_icon_size"</span>
+        <span class="na">android:layout_height=</span><span class="s">"@dimen/medium_icon_size"</span>
+        <span class="na">android:layout_marginEnd=</span><span class="s">"@dimen/activity_horizontal_margin"</span>
+        <span class="na">android:padding=</span><span class="s">"5dp"</span>
+        <span class="na">android:layout_alignParentEnd=</span><span class="s">"true"</span>
+        <span class="na">android:scaleType=</span><span class="s">"fitCenter"</span>
+        <span class="na">android:src=</span><span class="s">"@drawable/location_black"</span>
+        <span class="na">android:visibility=</span><span class="s">"gone"</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/RelativeLayout&gt;</span>
+</code></pre></div></div>
+
+<p>  就是很简单的一个Relativelayout包住了一个TextView和一个Imageview，然后重点在于Relativelayout我设置了marginStart/End/Top三个margin相关的属性。在MainActivity里面动态加载这个布局文件</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="nc">AppCompatActivity</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="nc">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+        <span class="n">setContentView</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">activity_main</span><span class="o">);</span>
+
+        <span class="nc">LinearLayout</span> <span class="n">layout</span> <span class="o">=</span> <span class="n">findViewById</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">container</span><span class="o">);</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="o">;</span> <span class="n">i</span><span class="o">++){</span>
+            <span class="nc">RelativeLayout</span> <span class="n">entity</span> <span class="o">=</span> <span class="o">(</span><span class="nc">RelativeLayout</span><span class="o">)</span> <span class="k">this</span><span class="o">.</span><span class="na">getLayoutInflater</span><span class="o">().</span><span class="na">inflate</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">reminder_entity_template</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+            <span class="n">layout</span><span class="o">.</span><span class="na">addView</span><span class="o">(</span><span class="n">entity</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>什么鬼？这是什么效果？？</p>
+
+<p><img src="https://img-blog.csdn.net/20180725080503884?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2tld2VpMTY4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="反面典型" /></p>
+
+<p>  查阅资料后发现，原来在加载这个布局的时候只有指定了其父布局，他的margin属性才会生效</p>
+
+<p>将原来的这行代码</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">RelativeLayout</span> <span class="n">entity</span> <span class="o">=</span> <span class="o">(</span><span class="nc">RelativeLayout</span><span class="o">)</span> <span class="k">this</span><span class="o">.</span><span class="na">getLayoutInflater</span><span class="o">().</span><span class="na">inflate</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">reminder_entity_template</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>改为</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">RelativeLayout</span> <span class="n">entity</span> <span class="o">=</span> <span class="o">(</span><span class="nc">RelativeLayout</span><span class="o">)</span> <span class="k">this</span><span class="o">.</span><span class="na">getLayoutInflater</span><span class="o">().</span><span class="na">inflate</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">reminder_entity_template</span><span class="o">,</span> <span class="n">layout</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>然后再试一次，大功告成！</p>
+
+<p><img src="https://img-blog.csdn.net/20180725080518987?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2tld2VpMTY4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="大功告成" /></p>
+:ET

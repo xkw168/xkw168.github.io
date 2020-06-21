@@ -1,0 +1,207 @@
+I"s[<ul id="markdown-toc">
+  <li><a href="#文章链接" id="markdown-toc-文章链接">文章链接</a></li>
+  <li><a href="#模型原理" id="markdown-toc-模型原理">模型原理</a></li>
+  <li><a href="#模型安装" id="markdown-toc-模型安装">模型安装</a></li>
+  <li><a href="#模型实现" id="markdown-toc-模型实现">模型实现</a>    <ul>
+      <li><a href="#关键参数" id="markdown-toc-关键参数">关键参数</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="文章链接">文章链接</h2>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%B8%80-%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86/">（一）数据预处理</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%BA%8C-AR%E6%A8%A1%E5%9E%8B/">（二）AR模型（自回归模型）</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%B8%89-Xgboost%E6%A8%A1%E5%9E%8B/">（三）Xgboost模型</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E5%9B%9B-LSTM%E6%A8%A1%E5%9E%8B/">（四）LSTM模型</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%BA%94-Prophet%E6%A8%A1%E5%9E%8B/">（五）Prophet模型（自回归模型）</a></p>
+
+<hr />
+
+<h2 id="模型原理">模型原理</h2>
+
+<p>  AR（auto-regressive）模型，亦即是自回归模型，是时间序列分析模型中最简单的两个模型其中之一（另一个是MA/Moving Average/滑动平均模型）。其原理是利用观测点前若干时刻的变量的线性组合来描述观测点后若干时刻变量的值，属于线性回归模型。AR(p)模型认为，任意时刻的观测值\(x_t\)取决于前面p个时刻的观测值加上一个误差，见下式：</p>
+
+\[x_t = \phi_0 + \phi_1x_{t-1} + \phi_2x_{t-2} + \dots + \phi_px_{t-p} + \varepsilon_t\]
+
+<p>\(\varepsilon_t\)是均值为0，方差为\(\sigma^2\)的白噪声序列。</p>
+
+<hr />
+
+<h2 id="模型安装">模型安装</h2>
+
+<p><code class="language-plaintext highlighter-rouge">pip install tensorflow</code></p>
+
+<hr />
+
+<h2 id="模型实现">模型实现</h2>
+
+<p>  这里使用的是TensorFlow里面的Timeseries模块实现AR模型</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">now</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="p">.</span><span class="n">now</span><span class="p">().</span><span class="n">strftime</span><span class="p">(</span><span class="s">"%m_%d_%H_%M_%s"</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">parse_result_tf</span><span class="p">(</span><span class="n">tf_data</span><span class="p">):</span>
+    <span class="s">"""
+    parse the result of model output in tensorflow
+    :param tf_data: the output of tensorflow
+    :return: data in DataFrame format
+    """</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s">"ds"</span><span class="p">:</span> <span class="n">tf_data</span><span class="p">[</span><span class="s">"times"</span><span class="p">].</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="s">"y"</span><span class="p">:</span> <span class="n">tf_data</span><span class="p">[</span><span class="s">"mean"</span><span class="p">].</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)})</span>
+
+
+<span class="k">def</span> <span class="nf">generate_time_series</span><span class="p">(</span>
+        <span class="n">start_date</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2006</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">cnt</span><span class="o">=</span><span class="mi">4018</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">timestamp</span><span class="o">=</span><span class="bp">False</span>
+<span class="p">):</span>
+    <span class="s">"""
+    generate a time series/index
+    :param start_date: start date
+    :param cnt: date count. If =cnt are specified, delta must not be; one is required
+    :param delta: time delta, default is one day.
+    :param timestamp: output timestamp or format string
+    :return: list of time string or timestamp
+    """</span>
+
+    <span class="k">def</span> <span class="nf">per_delta</span><span class="p">():</span>
+        <span class="n">curr</span> <span class="o">=</span> <span class="n">start_date</span>
+        <span class="k">while</span> <span class="n">curr</span> <span class="o">&lt;</span> <span class="n">end_date</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">curr</span>
+            <span class="n">curr</span> <span class="o">+=</span> <span class="n">delta</span>
+
+    <span class="n">end_date</span> <span class="o">=</span> <span class="n">start_date</span> <span class="o">+</span> <span class="n">delta</span> <span class="o">*</span> <span class="n">cnt</span>
+
+    <span class="n">time_series</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">timestamp</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">per_delta</span><span class="p">():</span>
+            <span class="n">time_series</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">.</span><span class="n">timestamp</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">per_delta</span><span class="p">():</span>
+            <span class="n">time_series</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="c1"># print(t.strftime("%Y-%m-%d"))
+</span>    <span class="k">return</span> <span class="n">time_series</span>
+
+
+<span class="k">def</span> <span class="nf">AR_predict_tf</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">evaluation_data</span><span class="p">,</span> <span class="n">forecast_cnt</span><span class="o">=</span><span class="mi">365</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s">"D"</span><span class="p">,</span> <span class="n">model_dir</span><span class="o">=</span><span class="s">""</span><span class="p">):</span>
+    <span class="s">"""
+    predict time series with auto-regressive model in tensorflow
+    :param train_data: data use to train the model
+    :param evaluation_data: data use to evaluate the model
+    :param forecast_cnt: how many point needed to be predicted
+    :param freq: the interval between time index
+    :param model_dir: directory of pre-trained model(checkpoint, params)
+    :return:
+    """</span>
+    <span class="n">model_directory</span> <span class="o">=</span> <span class="s">"./model/AR_%s"</span> <span class="o">%</span> <span class="n">now</span><span class="p">()</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="c1"># periodicities of the input data, in the same units as the time feature.
+</span>        <span class="c1"># Note this can be a single value or a list of values for multiple periodicities.
+</span>        <span class="s">"periodicities"</span><span class="p">:</span> <span class="mi">52</span><span class="p">,</span>
+        <span class="c1"># Number of past time steps of data to look at when doing the regression
+</span>        <span class="s">"input_window_size"</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+        <span class="c1"># Number of future time steps to predict. Note that setting it to &gt; 1 empirically seems to give a better fit
+</span>        <span class="s">"output_window_size"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="c1"># The dimensionality of the time series (one for univariate, more than one for multivariate)
+</span>        <span class="s">"num_features"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="c1"># how many steps we train the model
+</span>        <span class="s">"global_steps"</span><span class="p">:</span> <span class="mi">3000</span>
+    <span class="p">}</span>
+    <span class="c1"># if there is a pre-trained model, use parameters from it
+</span>    <span class="k">if</span> <span class="n">model_dir</span><span class="p">:</span>
+        <span class="n">model_directory</span> <span class="o">=</span> <span class="n">model_dir</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">read_model_param</span><span class="p">(</span><span class="n">model_dir</span> <span class="o">+</span> <span class="s">"/params.txt"</span><span class="p">)</span>
+
+    <span class="c1"># create time index for model training(use int)
+</span>    <span class="n">time_int</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">evaluation_data</span><span class="p">))</span>
+
+    <span class="n">data_train</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">timeseries</span><span class="p">.</span><span class="n">TrainEvalFeatures</span><span class="p">.</span><span class="n">TIMES</span><span class="p">:</span> <span class="n">time_int</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">train_data</span><span class="p">)],</span>
+        <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">timeseries</span><span class="p">.</span><span class="n">TrainEvalFeatures</span><span class="p">.</span><span class="n">VALUES</span><span class="p">:</span> <span class="n">train_data</span><span class="p">[</span><span class="s">"y"</span><span class="p">],</span>
+    <span class="p">}</span>
+
+    <span class="n">data_eval</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">timeseries</span><span class="p">.</span><span class="n">TrainEvalFeatures</span><span class="p">.</span><span class="n">TIMES</span><span class="p">:</span> <span class="n">time_int</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">train_data</span><span class="p">):],</span>
+        <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">timeseries</span><span class="p">.</span><span class="n">TrainEvalFeatures</span><span class="p">.</span><span class="n">VALUES</span><span class="p">:</span> <span class="n">evaluation_data</span><span class="p">[</span><span class="s">"y"</span><span class="p">],</span>
+    <span class="p">}</span>
+
+    <span class="n">reader_train</span> <span class="o">=</span> <span class="n">NumpyReader</span><span class="p">(</span><span class="n">data_train</span><span class="p">)</span>
+    <span class="n">reader_eval</span> <span class="o">=</span> <span class="n">NumpyReader</span><span class="p">(</span><span class="n">data_eval</span><span class="p">)</span>
+
+    <span class="s">"""
+    define in tensorflow/contrib/timeseries/python/timeseries/input_pipeline.py
+    Note window_size must equal to input_window_size + output_window_size
+    """</span>
+    <span class="n">train_input_fn</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">timeseries</span><span class="p">.</span><span class="n">RandomWindowInputFn</span><span class="p">(</span>
+        <span class="n">reader_train</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s">"input_window_size"</span><span class="p">]</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="s">"output_window_size"</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="s">"""
+    define in tensorflow.contrib.timeseries.python.timeseries.estimators
+    periodicities: periodicities of the input data, in the same units as the time feature. 
+                   Note this can be a single value or a list of values for multiple periodicities
+    num_features: The dimensionality of the time series (one for univariate, more than one for multivariate
+    website: https://www.tensorflow.org/api_docs/python/tf/contrib/timeseries/ARRegressor
+    """</span>
+    <span class="n">estimator_ar</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">timeseries</span><span class="p">.</span><span class="n">ARRegressor</span><span class="p">(</span>
+        <span class="n">periodicities</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s">"periodicities"</span><span class="p">],</span>
+        <span class="n">input_window_size</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s">"input_window_size"</span><span class="p">],</span>
+        <span class="n">output_window_size</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s">"output_window_size"</span><span class="p">],</span>
+        <span class="n">num_features</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s">"num_features"</span><span class="p">],</span>
+        <span class="n">model_dir</span><span class="o">=</span><span class="n">model_directory</span><span class="p">,</span>
+        <span class="n">loss</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">timeseries</span><span class="p">.</span><span class="n">ARModel</span><span class="p">.</span><span class="n">NORMAL_LIKELIHOOD_LOSS</span>
+    <span class="p">)</span>
+
+    <span class="c1"># only train the model when there is no pre-trained model
+</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">model_dir</span><span class="p">:</span>
+        <span class="n">estimator_ar</span><span class="p">.</span><span class="n">train</span><span class="p">(</span><span class="n">input_fn</span><span class="o">=</span><span class="n">train_input_fn</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s">"global_steps"</span><span class="p">])</span>
+
+    <span class="n">evaluation_input_fn</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">timeseries</span><span class="p">.</span><span class="n">WholeDatasetInputFn</span><span class="p">(</span><span class="n">reader_eval</span><span class="p">)</span>
+    <span class="n">evaluation</span> <span class="o">=</span> <span class="n">estimator_ar</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">input_fn</span><span class="o">=</span><span class="n">evaluation_input_fn</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Predict starting after the evaluation
+</span>    <span class="p">(</span><span class="n">predictions</span><span class="p">,)</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">estimator_ar</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span>
+        <span class="n">input_fn</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">timeseries</span><span class="p">.</span><span class="n">predict_continuation_input_fn</span><span class="p">(</span>
+            <span class="n">evaluation</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">forecast_cnt</span><span class="p">)))</span>
+
+    <span class="n">save_model_param</span><span class="p">(</span><span class="n">model_directory</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s">"loss"</span> <span class="ow">in</span> <span class="n">evaluation</span><span class="p">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="c1"># mean loss per mini-batch
+</span>        <span class="k">print</span><span class="p">(</span><span class="s">"loss:%.5f"</span> <span class="o">%</span> <span class="n">evaluation</span><span class="p">[</span><span class="s">"loss"</span><span class="p">])</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_directory</span> <span class="o">+</span> <span class="s">"/%s"</span> <span class="o">%</span> <span class="n">evaluation</span><span class="p">[</span><span class="s">"loss"</span><span class="p">],</span> <span class="s">"w"</span><span class="p">)</span>
+        <span class="n">f</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">model_log</span><span class="p">(</span>
+            <span class="n">evaluation</span><span class="p">[</span><span class="s">"loss"</span><span class="p">],</span>
+            <span class="n">average_loss</span><span class="o">=-</span><span class="mi">1</span> <span class="k">if</span> <span class="s">"average_loss"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">evaluation</span><span class="p">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="n">evaluation</span><span class="p">[</span><span class="s">"average_loss"</span><span class="p">],</span>
+            <span class="n">content</span><span class="o">=</span><span class="n">model_dir</span>
+        <span class="p">)</span>
+
+    <span class="n">evaluation</span> <span class="o">=</span> <span class="n">parse_result_tf</span><span class="p">(</span><span class="n">evaluation</span><span class="p">)</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">parse_result_tf</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+    <span class="c1"># here we should add an offset which is related to window size due to the inherent attribute of AR
+</span>    <span class="n">first_date</span> <span class="o">=</span> <span class="n">evaluation_data</span><span class="p">[</span><span class="s">"ds"</span><span class="p">].</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> \
+                 <span class="n">delta_dict</span><span class="p">[</span><span class="n">freq</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s">"input_window_size"</span><span class="p">]</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="s">"output_window_size"</span><span class="p">])</span>
+    <span class="n">evaluation</span><span class="p">[</span><span class="s">"ds"</span><span class="p">]</span> <span class="o">=</span> <span class="n">generate_time_series</span><span class="p">(</span><span class="n">first_date</span><span class="p">,</span> <span class="n">cnt</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">evaluation</span><span class="p">),</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta_dict</span><span class="p">[</span><span class="n">freq</span><span class="p">])</span>
+    <span class="n">latest_date</span> <span class="o">=</span> <span class="n">evaluation</span><span class="p">[</span><span class="s">"ds"</span><span class="p">].</span><span class="n">tolist</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">predictions</span><span class="p">[</span><span class="s">"ds"</span><span class="p">]</span> <span class="o">=</span> <span class="n">generate_time_series</span><span class="p">(</span><span class="n">latest_date</span><span class="p">,</span> <span class="n">cnt</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">),</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta_dict</span><span class="p">[</span><span class="n">freq</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">predictions</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="关键参数">关键参数</h3>
+
+<ul>
+  <li>periodicities：数据的周期性，这个周期可以是一个列表（数据拥有多个周期）；</li>
+  <li>input_window_size：输入的窗口大小，亦即是做回归分析的时候一次性观察多少个过去观测值；</li>
+  <li>output_window_size：输出窗口的大小，亦即是一次预测多少个未来数据；</li>
+  <li>num_features：时间序列的维度，亦即是一个时间点对应的观察值数量，同时分析多少个时间序列，这个值就为多少；</li>
+  <li>model_dir：预训练模型保存的位置（可以不指定）；</li>
+  <li>loss：损失函数；</li>
+  <li>steps：模型的训练迭代次数，这里设置为3000次。</li>
+</ul>
+:ET

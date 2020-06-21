@@ -1,0 +1,182 @@
+I"�!<ul id="markdown-toc">
+  <li><a href="#emacs-快捷键" id="markdown-toc-emacs-快捷键">Emacs 快捷键</a></li>
+  <li><a href="#valgrind-简介" id="markdown-toc-valgrind-简介">Valgrind 简介</a></li>
+  <li><a href="#makefile-简介" id="markdown-toc-makefile-简介">MakeFile 简介</a></li>
+</ul>
+
+<h2 id="emacs-快捷键">Emacs 快捷键</h2>
+
+<p>  最近由于课程要求，不得不开始学习Emacs的使用，开个博客记录一下Emacs痛苦的入门之路，简单记录一下常用的快捷键。持续更新ing…</p>
+
+<p>注：关于Emacs和Vim的区别，<a href="https://mp.weixin.qq.com/s/KTaEuy7kfm7t1bwQmvE32Q">这里</a>有一篇很好的文章</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Command</th>
+      <th style="text-align: center">Shortcut</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">Open(“visit”) file</td>
+      <td style="text-align: center">C-x C-f</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Save current buffer(an open file)</td>
+      <td style="text-align: center">C-x C-s</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Save as [another name]</td>
+      <td style="text-align: center">C-x C-w</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Quit Emacs</td>
+      <td style="text-align: center">C-x C-c</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Suspend Emacs</td>
+      <td style="text-align: center">C-z</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Resume Emacs(when it is suspended)</td>
+      <td style="text-align: center">fg</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Undo</td>
+      <td style="text-align: center">C-_</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Set mark(then you can select a region text using your cursor)</td>
+      <td style="text-align: center">C-@</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Cut(Kill)</td>
+      <td style="text-align: center">C-w</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Copy</td>
+      <td style="text-align: center">M-w</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Paste</td>
+      <td style="text-align: center">C-y</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Page down(up)</td>
+      <td style="text-align: center">C-v(M-v)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>搜索的功能相信是很多人日常的需求，Emacs当中，我们可以使用内置的isearch进行搜索：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Command</th>
+      <th style="text-align: center">Shortcut</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">Enter isearch mode</td>
+      <td style="text-align: center">M-x isearch-forward (then you can enter the keyword)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Jump to next occurrence</td>
+      <td style="text-align: center">C-s</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Jump to previous occurrence</td>
+      <td style="text-align: center">C-r</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Exit and place the cursor at origin position</td>
+      <td style="text-align: center">C-g</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Exit and place the cursor at current position</td>
+      <td style="text-align: center">Enter</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="valgrind-简介">Valgrind 简介</h2>
+
+<p>valgrind实际上是一系列工具的集合，在这里我们主要关注其中的<strong>内存检查</strong>工具，可以让我们检查程序是否存在内存泄露的问题（如：malloc分配了内存但是没有free，空指针…）</p>
+
+<p><strong>如何使用？</strong></p>
+
+<p>简单的使用valgrind指令来运行你的程序就好<code class="language-plaintext highlighter-rouge">valgrind ./myProgram hello 42</code></p>
+
+<p><strong>期待输出</strong></p>
+
+<p>如果你使用valgrind运行你的程序，你应该期待得到以下的输出：</p>
+
+<p><img src="/img/valgrind_expected_output.png" alt="expected output" /></p>
+
+<ul>
+  <li>All heap blocks were freed – no leaks are possible（没有内存泄漏，所有空间都已正确释放）</li>
+  <li>ERROR SUMMARY: 0 errors from 0 contexts（程序没有错误）</li>
+</ul>
+
+<p><strong>常见错误</strong></p>
+
+<p><img src="/img/uninitalized_value.png" alt="uninitalized_value" /></p>
+
+<ul>
+  <li>有时候你会（不经意间）使用到一些未初始化的变量(尤其是你使用<code class="language-plaintext highlighter-rouge">malloc</code>的时候， 如<code class="language-plaintext highlighter-rouge">char * str = malloc(cnt * sizeof(* str))</code>，这会使得你得到的指针指向一个未初始化的内存，相应的你应该使用 <code class="language-plaintext highlighter-rouge">calloc</code>, <code class="language-plaintext highlighter-rouge">char * str = calloc(cnt * sizeof(* str))</code>)</li>
+</ul>
+
+<p><img src="/img/invalidate_readwrite.png" alt="invalidate_read/write" /></p>
+
+<ul>
+  <li>有时候你会（不经意间）访问到一下不应该访问的内存（常由于数组越界导致）</li>
+</ul>
+
+<pre><code class="language-C">char * str1 = "Hello World";
+char * str2 = calloc(cnt * sizeof(* str2));
+strcpy(str2, str1);
+</code></pre>
+
+<p>注意 <code class="language-plaintext highlighter-rouge">strcpy</code> 会在字符串的结尾自动添加 <code class="language-plaintext highlighter-rouge">\0</code> ， 所以分配内存的时候，你需要为结束符多分配一个内存空间</p>
+
+<p><strong>常用指令</strong></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>valgrind <span class="nt">--track-origins</span><span class="o">=</span><span class="nb">yes</span> <span class="nt">--leak-check</span><span class="o">=</span>full ./myProgram
+</code></pre></div></div>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">--track-origins=yes</code> 告诉valgrind显示导致每一个错误发生的具体代码位置</li>
+  <li><code class="language-plaintext highlighter-rouge">--leak-check=full</code> 告诉valgrind显示每一个内存泄漏的具体信息（由什么导致，在哪里发生）</li>
+</ul>
+
+<h2 id="makefile-简介">MakeFile 简介</h2>
+
+<p>在 C 里面，我们使用 <code class="language-plaintext highlighter-rouge">gcc</code> 进行编译</p>
+
+<div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">CFLAGS</span><span class="o">=</span><span class="nt">-std</span><span class="o">=</span>gnu99 <span class="nt">-pedantic</span> <span class="nt">-Wall</span> <span class="nt">-Werror</span> <span class="nt">-ggdb3</span>
+<span class="nl">all</span><span class="o">:</span> <span class="nf">main.o</span>
+	gcc <span class="nt">-o</span> rand_story <span class="nv">$(CFLAGS)</span> main.o
+<span class="nl">main.o</span><span class="o">:</span> <span class="nf">main.c catarray.h</span>
+	gcc <span class="nt">-c</span> <span class="nv">$(CFLAGS)</span> main.c
+
+<span class="nl">.PHONY</span><span class="o">:</span> <span class="nf">clean</span>
+<span class="nl">clean</span><span class="o">:</span>
+	<span class="nb">rm</span> <span class="nt">-r</span> rand_story <span class="k">*</span>.o <span class="k">*</span>~
+</code></pre></div></div>
+
+<p>在 C++ 里面，我们使用 <code class="language-plaintext highlighter-rouge">g++</code> 进行编译</p>
+
+<div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">CFLAGS</span><span class="o">=</span> <span class="nt">-pedantic</span> <span class="nt">-Wall</span> <span class="nt">-Werror</span> <span class="nt">-ggdb3</span>
+<span class="nl">all</span><span class="o">:</span> <span class="nf">code.o</span>
+        <span class="err">g++</span> <span class="err">-o</span> <span class="err">code_output</span> <span class="err">$(CFLAGS)</span> <span class="err">code.o</span>
+<span class="nl">code.o</span><span class="o">:</span> <span class="nf">code.cpp</span>
+        <span class="err">g++</span> <span class="err">-c</span> <span class="err">$(CFLAGS)</span> <span class="err">code.cpp</span>
+
+<span class="nl">.PHONY</span><span class="o">:</span> <span class="nf">clean</span>
+<span class="nl">clean</span><span class="o">:</span>
+        <span class="err">rm</span> <span class="err">-r</span> <span class="err">code_output</span> <span class="err">*.o</span> <span class="err">*~</span>
+</code></pre></div></div>
+:ET

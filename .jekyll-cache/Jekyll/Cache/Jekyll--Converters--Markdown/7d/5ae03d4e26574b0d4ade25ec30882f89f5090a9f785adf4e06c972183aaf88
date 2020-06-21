@@ -1,0 +1,179 @@
+I"�<ul id="markdown-toc">
+  <li><a href="#emacs-introduction" id="markdown-toc-emacs-introduction">Emacs Introduction</a></li>
+  <li><a href="#valgrind-introduction" id="markdown-toc-valgrind-introduction">Valgrind Introduction</a></li>
+  <li><a href="#makefile-introduction" id="markdown-toc-makefile-introduction">MakeFile Introduction</a></li>
+</ul>
+
+<h2 id="emacs-introduction">Emacs Introduction</h2>
+
+<p>Some common keyboard shortcut of emacs are listed below:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Command</th>
+      <th style="text-align: center">Shortcut</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">Open(“visit”) file</td>
+      <td style="text-align: center">C-x C-f</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Save current buffer(an open file)</td>
+      <td style="text-align: center">C-x C-s</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Save as [another name]</td>
+      <td style="text-align: center">C-x C-w</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Quit Emacs</td>
+      <td style="text-align: center">C-x C-c</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Suspend Emacs</td>
+      <td style="text-align: center">C-z</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Resume Emacs(when it is suspended)</td>
+      <td style="text-align: center">fg</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Undo</td>
+      <td style="text-align: center">C-_</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Set mark(then you can select a region text using your cursor)</td>
+      <td style="text-align: center">C-@</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Cut(Kill)</td>
+      <td style="text-align: center">C-w</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Copy</td>
+      <td style="text-align: center">M-w</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Paste</td>
+      <td style="text-align: center">C-y</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Page down(up)</td>
+      <td style="text-align: center">C-v(M-v)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Search word in Emacs:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Command</th>
+      <th style="text-align: center">Shortcut</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">Enter isearch mode</td>
+      <td style="text-align: center">M-x isearch-forward (then you can enter the keyword)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Jump to next occurrence</td>
+      <td style="text-align: center">C-s</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Jump to previous occurrence</td>
+      <td style="text-align: center">C-r</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Exit and place the cursor at origin position</td>
+      <td style="text-align: center">C-g</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Exit and place the cursor at current position</td>
+      <td style="text-align: center">Enter</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="valgrind-introduction">Valgrind Introduction</h2>
+
+<p>Valgrind is actually a collection of tools, which are designed so that more can be added if desired. In here, we more focused on the <em>Memcheck</em> tool, which allowed us to check whether our program has some memory leak(e.g. caused by malloc but no free, dangle pointer…)</p>
+
+<p><strong>How to use?</strong></p>
+
+<p>Simply run your program with valgrind command with the argument your program need <code class="language-plaintext highlighter-rouge">valgrind ./myProgram hello 42</code></p>
+
+<p><strong>What to expect</strong></p>
+
+<p>if you run the command above, you should expect the following output, says:</p>
+
+<p><img src="/img/valgrind_expected_output.png" alt="expected output" /></p>
+
+<ul>
+  <li>All heap blocks were freed – no leaks are possible</li>
+  <li>ERROR SUMMARY: 0 errors from 0 contexts</li>
+</ul>
+
+<p><strong>What’s the typical error?</strong></p>
+
+<p><img src="/img/uninitalized_value.png" alt="uninitalized_value" /></p>
+
+<ul>
+  <li>Sometimes you just use some uninitialised value(especially you are using malloc)(e.g. <code class="language-plaintext highlighter-rouge">char * str = malloc(cnt * sizeof(* str))</code>, this will leave the pointer str you created uninitialised, instead you should use <code class="language-plaintext highlighter-rouge">calloc</code>, <code class="language-plaintext highlighter-rouge">char * str = calloc(cnt * sizeof(* str))</code>)</li>
+</ul>
+
+<p><img src="/img/invalidate_readwrite.png" alt="invalidate_read/write" /></p>
+
+<ul>
+  <li>Sometimes you may access some memory you are not suppose to access, for example</li>
+</ul>
+
+<pre><code class="language-C">char * str1 = "Hello World";
+char * str2 = calloc(cnt * sizeof(* str2));
+strcpy(str2, str1);
+</code></pre>
+
+<p>note that <code class="language-plaintext highlighter-rouge">strcpy</code> will add a <code class="language-plaintext highlighter-rouge">\0</code> at the end of the string, so you should allocate len + 1 size of memory</p>
+
+<p><strong>Useful command</strong></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>valgrind <span class="nt">--track-origins</span><span class="o">=</span><span class="nb">yes</span> <span class="nt">--leak-check</span><span class="o">=</span>full ./myProgram
+</code></pre></div></div>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">--track-origins=yes</code> tells the valgrind to track exactly where each error happen</li>
+  <li><code class="language-plaintext highlighter-rouge">--leak-check=full</code> tells the valgrind to show exactly where each memory leak error happen</li>
+</ul>
+
+<h2 id="makefile-introduction">MakeFile Introduction</h2>
+
+<p>for C, we use <code class="language-plaintext highlighter-rouge">gcc</code> to compile</p>
+
+<div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">CFLAGS</span><span class="o">=</span><span class="nt">-std</span><span class="o">=</span>gnu99 <span class="nt">-pedantic</span> <span class="nt">-Wall</span> <span class="nt">-Werror</span> <span class="nt">-ggdb3</span>
+<span class="nl">all</span><span class="o">:</span> <span class="nf">main.o</span>
+	gcc <span class="nt">-o</span> rand_story <span class="nv">$(CFLAGS)</span> main.o
+<span class="nl">main.o</span><span class="o">:</span> <span class="nf">main.c catarray.h</span>
+	gcc <span class="nt">-c</span> <span class="nv">$(CFLAGS)</span> main.c
+
+<span class="nl">.PHONY</span><span class="o">:</span> <span class="nf">clean</span>
+<span class="nl">clean</span><span class="o">:</span>
+	<span class="nb">rm</span> <span class="nt">-r</span> rand_story <span class="k">*</span>.o <span class="k">*</span>~
+</code></pre></div></div>
+
+<p>for C++, we use <code class="language-plaintext highlighter-rouge">g++</code> to compile</p>
+<div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">CFLAGS</span><span class="o">=</span> <span class="nt">-pedantic</span> <span class="nt">-Wall</span> <span class="nt">-Werror</span> <span class="nt">-ggdb3</span>
+<span class="nl">all</span><span class="o">:</span> <span class="nf">code.o</span>
+        <span class="err">g++</span> <span class="err">-o</span> <span class="err">code_output</span> <span class="err">$(CFLAGS)</span> <span class="err">code.o</span>
+<span class="nl">code.o</span><span class="o">:</span> <span class="nf">code.cpp</span>
+        <span class="err">g++</span> <span class="err">-c</span> <span class="err">$(CFLAGS)</span> <span class="err">code.cpp</span>
+
+<span class="nl">.PHONY</span><span class="o">:</span> <span class="nf">clean</span>
+<span class="nl">clean</span><span class="o">:</span>
+        <span class="err">rm</span> <span class="err">-r</span> <span class="err">code_output</span> <span class="err">*.o</span> <span class="err">*~</span>
+</code></pre></div></div>
+:ET

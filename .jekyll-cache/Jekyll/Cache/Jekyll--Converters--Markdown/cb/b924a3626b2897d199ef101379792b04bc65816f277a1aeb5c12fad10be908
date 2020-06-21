@@ -1,0 +1,53 @@
+I"=	<ul id="markdown-toc">
+  <li><a href="#anaconda" id="markdown-toc-anaconda">anaconda</a></li>
+  <li><a href="#pip" id="markdown-toc-pip">pip</a></li>
+  <li><a href="#国内镜像源" id="markdown-toc-国内镜像源">国内镜像源</a></li>
+</ul>
+
+<p>  pip和anaconda是两款十分优秀的python包管理器，到那时由于他们的默认源都是在国外，经常会出现下载速度缓慢甚至是连接断开导致失败，所以这里分别介绍一下如何将其默认下载源改为国内的镜像（以清华大学镜像源为例）。但有些时候不排除国内镜像上不去等情况，这时候可能会想回到默认镜像，这里也提供了相应的方法</p>
+
+<h2 id="anaconda">anaconda</h2>
+<p>永久修改</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+conda config --set show_channel_urls yes
+</code></pre></div></div>
+
+<p>换回默认镜像源</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>conda config --remove-key channels
+</code></pre></div></div>
+
+<h2 id="pip">pip</h2>
+
+<p>临时使用</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install -i https://pypi.tuna.tsinghua.edu.cn/simple some-package
+</code></pre></div></div>
+
+<p>永久修改</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install pip -U
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+</code></pre></div></div>
+
+<p>换回默认源</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip config set global.index-url https://pypi.org/simple/
+</code></pre></div></div>
+
+<h2 id="国内镜像源">国内镜像源</h2>
+
+<p>豆瓣：http://pypi.douban.com/</p>
+
+<p>华中理工大学：http://pypi.hustunique.com/</p>
+
+<p>山东理工大学：http://pypi.sdutlinux.org/</p>
+
+<p>中国科学技术大学：http://pypi.mirrors.ustc.edu.cn/</p>
+
+<p>阿里云：http://mirrors.aliyun.com/pypi/simple/</p>
+
+<p>清华大学：https://pypi.tuna.tsinghua.edu.cn/simple/</p>
+:ET

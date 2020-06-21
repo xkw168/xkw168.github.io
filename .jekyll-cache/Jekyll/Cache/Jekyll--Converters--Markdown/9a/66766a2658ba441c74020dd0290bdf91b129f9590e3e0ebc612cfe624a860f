@@ -1,0 +1,246 @@
+I"(:<ul id="markdown-toc">
+  <li><a href="#利用脚本测试程序" id="markdown-toc-利用脚本测试程序">利用脚本测试程序</a>    <ul>
+      <li><a href="#基本概念" id="markdown-toc-基本概念">基本概念</a></li>
+      <li><a href="#输出一段话" id="markdown-toc-输出一段话">输出一段话</a></li>
+      <li><a href="#变量" id="markdown-toc-变量">变量</a></li>
+      <li><a href="#变量运算" id="markdown-toc-变量运算">变量运算</a></li>
+      <li><a href="#变量输出格式控制" id="markdown-toc-变量输出格式控制">变量输出格式控制</a></li>
+      <li><a href="#从命令行读入指令" id="markdown-toc-从命令行读入指令">从命令行读入指令</a></li>
+      <li><a href="#循环for" id="markdown-toc-循环for">循环（for）</a></li>
+      <li><a href="#数组" id="markdown-toc-数组">数组</a></li>
+      <li><a href="#条件判断if-else" id="markdown-toc-条件判断if-else">条件判断（if-else）</a></li>
+      <li><a href="#读取文件" id="markdown-toc-读取文件">读取文件</a></li>
+      <li><a href="#写入文件" id="markdown-toc-写入文件">写入文件</a></li>
+      <li><a href="#简单的运行一个可执行程序" id="markdown-toc-简单的运行一个可执行程序">简单的运行一个可执行程序</a></li>
+      <li><a href="#将可执行程序的输出写入到文件内" id="markdown-toc-将可执行程序的输出写入到文件内">将可执行程序的输出写入到文件内</a></li>
+      <li><a href="#简易版自动化测试脚本" id="markdown-toc-简易版自动化测试脚本">简易版自动化测试脚本</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="利用脚本测试程序">利用脚本测试程序</h2>
+
+<p>前言：最近第一次作业，用残酷的事实告诉了我测试的重要性。平时测试的时候，经常自己一个个情况测，每测一次都要重新输入一次，费时费力效果差，所以下定决心学一下如何利用脚本进行简单的程序测试，下面记录一下一下用到的语法。</p>
+
+<h3 id="基本概念">基本概念</h3>
+
+<p>以Mac为例，新建一个脚本的基本流程为</p>
+
+<ul>
+  <li>新建脚本文件（后缀为sh）<code class="language-plaintext highlighter-rouge">touch script.sh</code></li>
+  <li>打开并修改脚本文件<code class="language-plaintext highlighter-rouge">open script.sh</code> or <code class="language-plaintext highlighter-rouge">emacs -nw script.sh</code></li>
+  <li>修改脚本文件的权限<code class="language-plaintext highlighter-rouge">chmod +x script.sh</code></li>
+</ul>
+
+<p>注意事项：</p>
+
+<ul>
+  <li>脚本是对空格敏感的，如<code class="language-plaintext highlighter-rouge">a="Hello World"</code>是合法的（声明了一个变量），而<code class="language-plaintext highlighter-rouge">a = "Hello World"</code>是不合法的（等号两边多了一个空格）</li>
+</ul>
+
+<h3 id="输出一段话">输出一段话</h3>
+
+<ul>
+  <li>利用<code class="language-plaintext highlighter-rouge">echo</code>向屏幕输出一段话</li>
+</ul>
+
+<p>向控制台输出Hello World $\dArr$</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo </span>Hello World
+</code></pre></div></div>
+
+<h3 id="变量">变量</h3>
+
+<ul>
+  <li>利用<code class="language-plaintext highlighter-rouge">$</code>符号引用一个变量</li>
+</ul>
+
+<p>利用一个变量，向控制台输出Hello World $\dArr$</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">a</span><span class="o">=</span><span class="s2">"Hello World"</span>
+<span class="nb">echo</span> <span class="nv">$a</span>
+</code></pre></div></div>
+
+<h3 id="变量运算">变量运算</h3>
+
+<p>修改一个变量的值（<strong>4</strong>种方法） $\dArr$</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">let </span>i+<span class="o">=</span>1<span class="p">;</span>
+<span class="o">((</span>i++<span class="o">))</span><span class="p">;</span>
+<span class="nv">i</span><span class="o">=</span><span class="nv">$[$i</span>+1]<span class="p">;</span>
+<span class="nv">i</span><span class="o">=</span><span class="k">$((</span><span class="nv">$i</span><span class="o">+</span><span class="m">1</span><span class="k">))</span>
+</code></pre></div></div>
+
+<h3 id="变量输出格式控制">变量输出格式控制</h3>
+
+<ul>
+  <li>可以通过printf来控制变量输出的格式（如固定5位，多余的补0）</li>
+  <li>还可以将printf的结果保存到一个变量内方便使用</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># printf in binary</span>
+<span class="nb">printf</span> <span class="s2">"%05d</span><span class="se">\n</span><span class="s2">"</span> <span class="sb">`</span><span class="nb">echo</span> <span class="s2">"obase=2;</span><span class="nv">$var</span><span class="s2">"</span> | bc<span class="sb">`</span>
+<span class="c"># printf in decimal</span>
+<span class="nb">printf</span> <span class="s2">"%05d"</span> <span class="s2">"</span><span class="nv">$var</span><span class="s2">"</span>
+<span class="c"># store the result of printf into a variable</span>
+<span class="nv">var</span><span class="o">=</span><span class="si">$(</span><span class="nb">printf</span> <span class="s2">"%05d</span><span class="se">\n</span><span class="s2">"</span> <span class="sb">`</span><span class="nb">echo</span> <span class="s2">"obase=2;</span><span class="nv">$var</span><span class="s2">"</span> | bc<span class="sb">`</span><span class="si">)</span><span class="p">;</span>
+<span class="nb">echo</span> <span class="nv">$var</span>
+</code></pre></div></div>
+
+<h3 id="从命令行读入指令">从命令行读入指令</h3>
+
+<ul>
+  <li>利用<code class="language-plaintext highlighter-rouge">read</code>指令从命令行读入数据（保存在一个变量内）</li>
+</ul>
+
+<p>从命令行读入一个字符串，并原样输出 $\dArr$</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">read </span>readAll
+<span class="nb">echo </span>you enter <span class="nv">$readAll</span>
+</code></pre></div></div>
+
+<h3 id="循环for">循环（for）</h3>
+
+<ul>
+  <li>注意for循环有两层括号</li>
+  <li>要打引号<code class="language-plaintext highlighter-rouge">;</code></li>
+</ul>
+
+<p>循环向控制台输出 30 个 Hello World $\dArr$</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span><span class="o">((</span><span class="nv">i</span><span class="o">=</span>0<span class="p">;</span>i&lt;30<span class="p">;</span>i++<span class="o">))</span><span class="p">;</span>
+<span class="k">do
+    </span><span class="nb">echo </span>Hello World <span class="nv">$i</span>
+<span class="k">done</span>
+</code></pre></div></div>
+
+<h3 id="数组">数组</h3>
+
+<ul>
+  <li>利用括号声明一个数组，数组元素之间用空格隔开</li>
+  <li>利用<code class="language-plaintext highlighter-rouge">${list[index]}</code>访问数组元素</li>
+</ul>
+
+<p>将整个数组输出到命令行 $\dArr$</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">story_list</span><span class="o">=(</span>hello0 hello1 hello2<span class="o">)</span>
+
+<span class="k">for</span><span class="o">((</span><span class="nv">i</span><span class="o">=</span>0<span class="p">;</span>i&lt;3<span class="p">;</span>i++<span class="o">))</span><span class="p">;</span>
+<span class="k">do
+    </span><span class="nb">echo</span> <span class="k">${</span><span class="nv">story_list</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span><span class="k">}</span>
+<span class="k">done
+
+for </span>i <span class="k">in</span> <span class="o">{</span>0..3<span class="o">}</span><span class="p">;</span>
+<span class="k">do
+    </span><span class="nb">echo</span> <span class="k">${</span><span class="nv">story_list</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span><span class="k">}</span>
+<span class="k">done</span>
+</code></pre></div></div>
+
+<h3 id="条件判断if-else">条件判断（if-else）</h3>
+
+<ul>
+  <li>条件判断需要两个中括号</li>
+  <li>用<code class="language-plaintext highlighter-rouge">then</code>和<code class="language-plaintext highlighter-rouge">fi</code>来表示if-else的范围</li>
+</ul>
+
+<p>读入一个字符，并作出判断 $\dArr$</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s2">"do you...?(y/n):"</span>
+<span class="nb">read </span>readAll
+
+<span class="k">if</span> <span class="o">[[</span> <span class="nv">$readAll</span> <span class="o">=</span> <span class="s2">"y"</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then
+    </span><span class="nb">echo yes
+</span><span class="k">else
+    </span><span class="nb">echo</span> <span class="s2">"no"</span>
+<span class="k">fi</span>
+</code></pre></div></div>
+
+<h3 id="读取文件">读取文件</h3>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">cat</code>指令：以文本形式输出文件内容</li>
+</ul>
+
+<p>逐行读取并输出文件内容 $\dArr$</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat </span>filename.txt | <span class="k">while </span><span class="nb">read </span>line
+<span class="k">do
+    </span><span class="nb">echo</span> <span class="nv">$line</span>
+<span class="k">done</span>
+</code></pre></div></div>
+
+<h3 id="写入文件">写入文件</h3>
+
+<ul>
+  <li>利用插入符<code class="language-plaintext highlighter-rouge">&gt;&gt;</code>写入文件</li>
+  <li>利用<code class="language-plaintext highlighter-rouge">$FILE</code>来指定某个文件</li>
+</ul>
+
+<p>打开一个文件，写入一个变量和一串字符$\dArr$</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">a</span><span class="o">=</span><span class="s2">"Hello world"</span>
+<span class="nv">FILE</span><span class="o">=</span><span class="s2">"./filename.txt"</span>
+<span class="nb">echo</span> <span class="nv">$a</span> <span class="o">&gt;&gt;</span> <span class="nv">$FILE</span>
+<span class="nb">echo</span> <span class="s2">"----------------------"</span> <span class="o">&gt;&gt;</span> <span class="nv">$FILE</span>
+</code></pre></div></div>
+
+<h3 id="简单的运行一个可执行程序">简单的运行一个可执行程序</h3>
+
+<ul>
+  <li>rand_story 是一个编译好的可执行程序，story.txt，words.txt和3是这个程序接受的三个输入参数</li>
+</ul>
+
+<p>运行程序rand_story $\dArr$</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./rand_story story.txt words.txt 3
+</code></pre></div></div>
+
+<h3 id="将可执行程序的输出写入到文件内">将可执行程序的输出写入到文件内</h3>
+
+<ul>
+  <li><strong>注意</strong>第一行用的是 ` 而不是单引号 ‘</li>
+</ul>
+
+<p>运行程序rand_story，并将程序输出写入到指定文件 $\dArr$</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">cmd</span><span class="o">=</span><span class="sb">`</span>./rand_story story.txt words.txt 3<span class="sb">`</span>
+<span class="nv">a</span><span class="o">=</span><span class="k">${</span><span class="nv">cmd</span><span class="k">}</span>
+<span class="nv">FILE</span><span class="o">=</span><span class="s2">"./output.txt"</span>
+<span class="nb">echo</span> <span class="s2">"</span><span class="nv">$a</span><span class="s2">"</span> <span class="o">&gt;&gt;</span> <span class="nv">$FILE</span>
+</code></pre></div></div>
+
+<h3 id="简易版自动化测试脚本">简易版自动化测试脚本</h3>
+
+<ul>
+  <li>利用循环更改数字类参数</li>
+  <li>利用循环 + 数组更改字符串类参数</li>
+  <li>将所有结果写入.txt文件</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># file name</span>
+<span class="nv">FILE</span><span class="o">=</span><span class="s2">"./output.txt"</span>
+<span class="c"># clear the file content</span>
+<span class="nb">echo</span> <span class="s2">""</span> <span class="o">&gt;</span> <span class="nv">$FILE</span>
+<span class="nb">echo</span> <span class="s2">"-----------test start-----------"</span> <span class="o">&gt;&gt;</span> <span class="nv">$FILE</span>
+
+<span class="c"># modify number parameter</span>
+<span class="k">for </span>i <span class="k">in</span> <span class="o">{</span>0..30<span class="o">}</span><span class="p">;</span>
+<span class="k">do
+    </span><span class="nb">echo</span> <span class="o">=====</span>testcase <span class="nv">$i</span><span class="o">=====</span> <span class="o">&gt;&gt;</span> <span class="nv">$FILE</span>
+    <span class="nv">cmd</span><span class="o">=</span><span class="sb">`</span>./rand_story story.txt words.txt <span class="nv">$i</span><span class="sb">`</span>
+    <span class="nv">a</span><span class="o">=</span><span class="k">${</span><span class="nv">cmd</span><span class="k">}</span>
+    <span class="nb">echo</span> <span class="nv">$a</span> <span class="o">&gt;&gt;</span> <span class="nv">$FILE</span>
+<span class="k">done
+
+</span><span class="nv">story_list</span><span class="o">=(</span>story.txt story1.txt story2.txt<span class="o">)</span>
+
+<span class="c"># modify string parameter</span>
+<span class="k">for </span>i <span class="k">in</span> <span class="o">{</span>0..2<span class="o">}</span><span class="p">;</span>
+<span class="k">do
+    </span><span class="nb">echo</span> <span class="o">=====</span>testcase <span class="nv">$i</span><span class="o">=====</span> <span class="o">&gt;&gt;</span> <span class="nv">$FILE</span>
+    <span class="nv">cmd</span><span class="o">=</span><span class="sb">`</span>./rand_story <span class="k">${</span><span class="nv">story_list</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span><span class="k">}</span> words.txt 1<span class="sb">`</span>
+    <span class="nv">a</span><span class="o">=</span><span class="k">${</span><span class="nv">cmd</span><span class="k">}</span>
+    <span class="nb">echo</span> <span class="nv">$a</span> <span class="o">&gt;&gt;</span> <span class="nv">$FILE</span>
+<span class="k">done</span>
+</code></pre></div></div>
+:ET

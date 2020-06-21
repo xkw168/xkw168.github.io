@@ -1,0 +1,77 @@
+I"I<ul id="markdown-toc">
+  <li><a href="#准备工作" id="markdown-toc-准备工作">准备工作</a>    <ul>
+      <li><a href="#安装emacs" id="markdown-toc-安装emacs">安装Emacs</a></li>
+      <li><a href="#修改emacs文件" id="markdown-toc-修改emacs文件">修改.emacs文件</a></li>
+    </ul>
+  </li>
+  <li><a href="#emacs--cc" id="markdown-toc-emacs--cc">Emacs + C/C++</a></li>
+  <li><a href="#emacs--java" id="markdown-toc-emacs--java">Emacs + Java</a></li>
+  <li><a href="#emacs--python" id="markdown-toc-emacs--python">Emacs + Python</a></li>
+  <li><a href="#emacs--verilog" id="markdown-toc-emacs--verilog">Emacs + Verilog</a></li>
+</ul>
+<p>除非明确表明，默认使用的是MacOS/Linux系统。</p>
+
+<h2 id="准备工作">准备工作</h2>
+
+<h4 id="安装emacs">安装Emacs</h4>
+
+<ul>
+  <li>MacOS用户：<code class="language-plaintext highlighter-rouge">brew install emacs</code></li>
+  <li>Windows用户：直接<a href="https://www.gnu.org/software/emacs/">官网</a>下载</li>
+  <li>Ubuntu用户：<code class="language-plaintext highlighter-rouge">sudo apt install emacs</code></li>
+</ul>
+
+<h4 id="修改emacs文件">修改.emacs文件</h4>
+
+<p>该文件一般位于用户的工作路径下面（<code class="language-plaintext highlighter-rouge">cd ~</code>），没有的话自己新建一个就好</p>
+
+<p>添加以下两行到.emacs文件里</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">require</span> <span class="ss">'package</span><span class="p">)</span>
+<span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">'package-archives</span> <span class="o">'</span><span class="p">(</span><span class="s">"melpa"</span> <span class="o">.</span> <span class="s">"http://melpa.org/packages/"</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h2 id="emacs--cc">Emacs + C/C++</h2>
+
+<ol>
+  <li>安装clang-format(用于自动修正格式)</li>
+</ol>
+
+<p><code class="language-plaintext highlighter-rouge">brew install clang-format</code>(<code class="language-plaintext highlighter-rouge">sudo apt install clang-format</code>)</p>
+
+<p>新建.clang-format和.clang-tidy两个文件（用于配置代码格式）</p>
+
+<p>我的配置：<a href="https://xkw168.github.io/files/clang-format">clang-format</a>, <a href="https://xkw168.github.io/files/clang-tidy">clang-tidy</a></p>
+
+<ol>
+  <li>打开emacs，然后<code class="language-plaintext highlighter-rouge">M-x list-packages</code>，进入包安装界面，安装以下包</li>
+</ol>
+
+<ul>
+  <li>clang-format</li>
+  <li>company</li>
+  <li>company-c-headers</li>
+  <li>company-rtags</li>
+  <li>flycheck-clang-…</li>
+  <li>flycheck-clang-…</li>
+  <li>flycheck-popup-tip</li>
+  <li>ggtags</li>
+  <li>popup-kill-ring</li>
+</ul>
+
+<p>然后在.emacs里面配置这些包</p>
+
+<p>我的配置：<a href="https://xkw168.github.io/files/emacs">emacs</a></p>
+
+<h2 id="emacs--java">Emacs + Java</h2>
+
+<h2 id="emacs--python">Emacs + Python</h2>
+
+<p>elpy</p>
+
+<p>py-yapf</p>
+
+<h2 id="emacs--verilog">Emacs + Verilog</h2>
+
+<p>verilog-mode</p>
+:ET

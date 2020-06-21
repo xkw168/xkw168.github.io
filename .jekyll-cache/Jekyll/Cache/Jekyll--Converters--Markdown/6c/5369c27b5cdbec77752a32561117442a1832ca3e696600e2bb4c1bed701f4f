@@ -1,0 +1,204 @@
+I"�^
+<p>  出于需要，APP里面需要一个根据给定数据绘制折线图的功能。上网查找了相关资料后惊奇的发现了功能强大的MPAndroidChart。在此与大家一起分享一下使用MPAndroidChart的方法。</p>
+
+<p>MPAndroidChart<a href="https://github.com/PhilJay/MPAndroidChart">源码</a></p>
+
+<hr />
+
+<p>引入相关依赖</p>
+
+<p>  要使用MPAndroidChart是要需要在工程里面引入相关的依赖。官方文档里面给出了四种引入方式，这里以开发环境为Android Studio为例（即Gradle dependency）。</p>
+
+<p>  首先在project level的build.gradle里面添加：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>allprojects {
+	repositories {
+		maven { url "https://jitpack.io" }
+	}
+}
+</code></pre></div></div>
+
+<p>  其次在app level的build.gradle里面添加：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dependencies {
+	implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+}
+</code></pre></div></div>
+
+<hr />
+
+<p>开始画图</p>
+
+<p>  MPAndroidChart的一大方便之处就是，画图就像添加一个控件那么方便。首先在.xml文件里面添加LineChart“控件”。</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="nt">&lt;android.support.constraint.ConstraintLayout</span> <span class="na">xmlns:android=</span><span class="s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="na">xmlns:app=</span><span class="s">"http://schemas.android.com/apk/res-auto"</span>
+    <span class="na">xmlns:tools=</span><span class="s">"http://schemas.android.com/tools"</span>
+    <span class="na">android:layout_width=</span><span class="s">"match_parent"</span>
+    <span class="na">android:layout_height=</span><span class="s">"match_parent"</span>
+    <span class="na">tools:context=</span><span class="s">"com.example.xkw.draw_data.MainActivity"</span><span class="nt">&gt;</span>
+
+    <span class="c">&lt;!--折线图--&gt;</span>
+    <span class="nt">&lt;com.github.mikephil.charting.charts.LineChart</span>
+        <span class="na">android:id=</span><span class="s">"@+id/chart1"</span>
+        <span class="na">android:layout_height=</span><span class="s">"match_parent"</span>
+        <span class="na">android:layout_width=</span><span class="s">"match_parent"</span>
+        <span class="nt">/&gt;</span>
+<span class="nt">&lt;/android.support.constraint.ConstraintLayout&gt;</span>
+</code></pre></div></div>
+
+<p>  然后，主程序里面实例化一个折线图并与该“控件”绑定，传入相关数据即可完成绘图。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="nc">AppCompatActivity</span> <span class="kd">implements</span> <span class="nc">OnChartGestureListener</span><span class="o">,</span><span class="nc">OnChartValueSelectedListener</span><span class="o">{</span>
+
+    <span class="kd">private</span> <span class="nc">LineChart</span> <span class="n">mChart</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">LineData</span> <span class="n">data</span><span class="o">;</span>
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="nc">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+        <span class="n">setContentView</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">activity_main</span><span class="o">);</span>
+        <span class="n">mChart</span> <span class="o">=</span> <span class="o">(</span><span class="nc">LineChart</span><span class="o">)</span> <span class="n">findViewById</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">chart1</span><span class="o">);</span>
+        <span class="n">mChart</span><span class="o">.</span><span class="na">setOnChartGestureListener</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+        <span class="n">mChart</span><span class="o">.</span><span class="na">setOnChartValueSelectedListener</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+        <span class="n">mChart</span><span class="o">.</span><span class="na">setDrawGridBackground</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+        <span class="c1">// 无描述文本</span>
+        <span class="n">mChart</span><span class="o">.</span><span class="na">getDescription</span><span class="o">().</span><span class="na">setEnabled</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+
+        <span class="c1">// 使能点击</span>
+        <span class="n">mChart</span><span class="o">.</span><span class="na">setTouchEnabled</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+
+        <span class="c1">// 使能拖动和缩放</span>
+        <span class="n">mChart</span><span class="o">.</span><span class="na">setDragEnabled</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+        <span class="n">mChart</span><span class="o">.</span><span class="na">setScaleEnabled</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+
+        <span class="c1">// 如果为false，则x，y两个方向可分别缩放</span>
+        <span class="n">mChart</span><span class="o">.</span><span class="na">setPinchZoom</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+
+        <span class="cm">/**
+         1.添加assets文件   project-&gt;src-&gt;main位置，右键new-&gt;Directory-&gt;assets
+         2.在assets文件中   new-&gt;Directory-&gt;Fonts文件
+         3.在Fonts文件中复制下载好的ttf文件，例如OpenSans-Regular.ttf
+         */</span>
+        <span class="c1">//设置上下限</span>
+        <span class="nc">Typeface</span> <span class="n">tf</span> <span class="o">=</span> <span class="nc">Typeface</span><span class="o">.</span><span class="na">createFromAsset</span><span class="o">(</span><span class="n">getBaseContext</span><span class="o">().</span><span class="na">getAssets</span><span class="o">(),</span> <span class="s">"Fonts/OpenSans-Regular.ttf"</span><span class="o">);</span>
+
+        <span class="nc">LimitLine</span> <span class="n">ll1</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LimitLine</span><span class="o">(</span><span class="mi">90</span><span class="n">f</span><span class="o">,</span> <span class="s">"Upper Limit"</span><span class="o">);</span>
+        <span class="n">ll1</span><span class="o">.</span><span class="na">setLineWidth</span><span class="o">(</span><span class="mi">4</span><span class="n">f</span><span class="o">);</span>
+        <span class="n">ll1</span><span class="o">.</span><span class="na">enableDashedLine</span><span class="o">(</span><span class="mi">10</span><span class="n">f</span><span class="o">,</span> <span class="mi">10</span><span class="n">f</span><span class="o">,</span> <span class="mi">0</span><span class="n">f</span><span class="o">);</span>
+        <span class="n">ll1</span><span class="o">.</span><span class="na">setLabelPosition</span><span class="o">(</span><span class="nc">LimitLine</span><span class="o">.</span><span class="na">LimitLabelPosition</span><span class="o">.</span><span class="na">RIGHT_TOP</span><span class="o">);</span>
+        <span class="n">ll1</span><span class="o">.</span><span class="na">setTextSize</span><span class="o">(</span><span class="mi">10</span><span class="n">f</span><span class="o">);</span>
+        <span class="n">ll1</span><span class="o">.</span><span class="na">setTypeface</span><span class="o">(</span><span class="n">tf</span><span class="o">);</span>
+
+        <span class="nc">LimitLine</span> <span class="n">ll2</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LimitLine</span><span class="o">(</span><span class="mi">80</span><span class="n">f</span><span class="o">,</span> <span class="s">"Lower Limit"</span><span class="o">);</span>
+        <span class="n">ll2</span><span class="o">.</span><span class="na">setLineWidth</span><span class="o">(</span><span class="mi">4</span><span class="n">f</span><span class="o">);</span>
+        <span class="n">ll2</span><span class="o">.</span><span class="na">enableDashedLine</span><span class="o">(</span><span class="mi">10</span><span class="n">f</span><span class="o">,</span> <span class="mi">10</span><span class="n">f</span><span class="o">,</span> <span class="mi">0</span><span class="n">f</span><span class="o">);</span>
+        <span class="n">ll2</span><span class="o">.</span><span class="na">setLabelPosition</span><span class="o">(</span><span class="nc">LimitLine</span><span class="o">.</span><span class="na">LimitLabelPosition</span><span class="o">.</span><span class="na">RIGHT_BOTTOM</span><span class="o">);</span>
+        <span class="n">ll2</span><span class="o">.</span><span class="na">setTextSize</span><span class="o">(</span><span class="mi">10</span><span class="n">f</span><span class="o">);</span>
+        <span class="n">ll2</span><span class="o">.</span><span class="na">setTypeface</span><span class="o">(</span><span class="n">tf</span><span class="o">);</span>
+
+        <span class="c1">//设置x轴位置</span>
+        <span class="nc">XAxis</span> <span class="n">xAxis</span> <span class="o">=</span> <span class="n">mChart</span><span class="o">.</span><span class="na">getXAxis</span><span class="o">();</span>
+        <span class="n">xAxis</span><span class="o">.</span><span class="na">setPosition</span><span class="o">(</span><span class="nc">XAxis</span><span class="o">.</span><span class="na">XAxisPosition</span><span class="o">.</span><span class="na">BOTTOM</span><span class="o">);</span>
+
+        <span class="c1">//去除右边的y轴</span>
+        <span class="nc">YAxis</span> <span class="n">yAxisRight</span> <span class="o">=</span> <span class="n">mChart</span><span class="o">.</span><span class="na">getAxisRight</span><span class="o">();</span>
+        <span class="n">yAxisRight</span><span class="o">.</span><span class="na">setEnabled</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+        <span class="nc">YAxis</span> <span class="n">yAxisLeft</span> <span class="o">=</span> <span class="n">mChart</span><span class="o">.</span><span class="na">getAxisLeft</span><span class="o">();</span>
+        <span class="n">yAxisLeft</span><span class="o">.</span><span class="na">addLimitLine</span><span class="o">(</span><span class="n">ll1</span><span class="o">);</span>
+        <span class="n">yAxisLeft</span><span class="o">.</span><span class="na">addLimitLine</span><span class="o">(</span><span class="n">ll2</span><span class="o">);</span>
+        <span class="n">init</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">init</span><span class="o">(){</span>
+        <span class="c1">//初始化数据</span>
+        <span class="nc">String</span> <span class="n">xl</span><span class="o">[]</span> <span class="o">={</span><span class="s">"1"</span><span class="o">,</span><span class="s">"2"</span><span class="o">,</span><span class="s">"3"</span><span class="o">,</span><span class="s">"4"</span><span class="o">,</span><span class="s">"5"</span><span class="o">,</span><span class="s">"6"</span><span class="o">,</span><span class="s">"7"</span><span class="o">,</span><span class="s">"8"</span><span class="o">,</span><span class="s">"9"</span><span class="o">,</span><span class="s">"10"</span><span class="o">};</span> <span class="c1">//横轴数据</span>
+        <span class="nc">String</span> <span class="n">yl</span><span class="o">[]</span> <span class="o">={</span><span class="s">"80"</span><span class="o">,</span><span class="s">"85"</span><span class="o">,</span><span class="s">"80"</span><span class="o">,</span><span class="s">"90"</span><span class="o">,</span><span class="s">"95"</span><span class="o">,</span><span class="s">"88"</span><span class="o">,</span><span class="s">"90"</span><span class="o">,</span><span class="s">"91"</span><span class="o">,</span><span class="s">"92"</span><span class="o">,</span><span class="s">"93"</span><span class="o">};</span> <span class="c1">//竖轴数据</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">getData</span><span class="o">(</span><span class="n">xl</span><span class="o">,</span><span class="n">yl</span><span class="o">);</span>
+        <span class="n">mChart</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">data</span><span class="o">);</span>
+        <span class="n">mChart</span><span class="o">.</span><span class="na">animateX</span><span class="o">(</span><span class="mi">2000</span><span class="o">);</span><span class="c1">//动画时间</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="nc">LineData</span> <span class="nf">getData</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">xx</span><span class="o">,</span> <span class="nc">String</span><span class="o">[]</span> <span class="n">yy</span><span class="o">){</span>
+        <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Entry</span><span class="o">&gt;</span> <span class="n">yVals</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Entry</span><span class="o">&gt;();</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">yy</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="c1">// 要显示的数据</span>
+            <span class="n">yVals</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="nc">Entry</span><span class="o">(</span><span class="nc">Float</span><span class="o">.</span><span class="na">parseFloat</span><span class="o">(</span><span class="n">xx</span><span class="o">[</span><span class="n">i</span><span class="o">]),</span><span class="nc">Float</span><span class="o">.</span><span class="na">parseFloat</span><span class="o">(</span><span class="n">yy</span><span class="o">[</span><span class="n">i</span><span class="o">])));</span>
+        <span class="o">}</span>
+        <span class="c1">//一条曲线对应一个LineDataSet</span>
+        <span class="nc">LineDataSet</span> <span class="n">set1</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LineDataSet</span><span class="o">(</span><span class="n">yVals</span><span class="o">,</span> <span class="s">"前五次的评分"</span><span class="o">);</span>
+        <span class="n">set1</span><span class="o">.</span><span class="na">setMode</span><span class="o">(</span><span class="nc">LineDataSet</span><span class="o">.</span><span class="na">Mode</span><span class="o">.</span><span class="na">CUBIC_BEZIER</span><span class="o">);</span><span class="c1">//设置曲线为圆滑的线</span>
+        <span class="n">set1</span><span class="o">.</span><span class="na">setCubicIntensity</span><span class="o">(</span><span class="mf">0.2f</span><span class="o">);</span>
+        <span class="n">set1</span><span class="o">.</span><span class="na">setDrawCircles</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>  <span class="c1">//设置有圆点</span>
+        <span class="n">set1</span><span class="o">.</span><span class="na">setLineWidth</span><span class="o">(</span><span class="mi">2</span><span class="n">f</span><span class="o">);</span>    <span class="c1">//设置线的宽度</span>
+        <span class="n">set1</span><span class="o">.</span><span class="na">setCircleSize</span><span class="o">(</span><span class="mi">5</span><span class="n">f</span><span class="o">);</span>   <span class="c1">//设置小圆的大小</span>
+        <span class="n">set1</span><span class="o">.</span><span class="na">setDrawFilled</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span><span class="c1">//设置包括的范围区域填充颜色</span>
+        <span class="n">set1</span><span class="o">.</span><span class="na">setCircleColor</span><span class="o">(</span><span class="nc">Color</span><span class="o">.</span><span class="na">rgb</span><span class="o">(</span><span class="mi">244</span><span class="o">,</span> <span class="mi">117</span><span class="o">,</span> <span class="mi">117</span><span class="o">));</span>
+        <span class="n">set1</span><span class="o">.</span><span class="na">setColor</span><span class="o">(</span><span class="nc">Color</span><span class="o">.</span><span class="na">rgb</span><span class="o">(</span><span class="mi">244</span><span class="o">,</span> <span class="mi">117</span><span class="o">,</span> <span class="mi">117</span><span class="o">));</span>
+        <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">ILineDataSet</span><span class="o">&gt;</span> <span class="n">dataSets</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">ILineDataSet</span><span class="o">&gt;();</span>
+        <span class="n">dataSets</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">set1</span><span class="o">);</span> <span class="c1">// add the datasets</span>
+
+        <span class="c1">// create a data object with the datasets</span>
+        <span class="nc">LineData</span> <span class="n">data</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LineData</span><span class="o">(</span><span class="n">dataSets</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onChartGestureStart</span><span class="o">(</span><span class="nc">MotionEvent</span> <span class="n">me</span><span class="o">,</span> <span class="nc">ChartTouchListener</span><span class="o">.</span><span class="na">ChartGesture</span> <span class="n">lastPerformedGesture</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onChartGestureEnd</span><span class="o">(</span><span class="nc">MotionEvent</span> <span class="n">me</span><span class="o">,</span> <span class="nc">ChartTouchListener</span><span class="o">.</span><span class="na">ChartGesture</span> <span class="n">lastPerformedGesture</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span><span class="o">(</span><span class="n">lastPerformedGesture</span> <span class="o">!=</span> <span class="nc">ChartTouchListener</span><span class="o">.</span><span class="na">ChartGesture</span><span class="o">.</span><span class="na">SINGLE_TAP</span><span class="o">)</span>
+            <span class="n">mChart</span><span class="o">.</span><span class="na">highlightValues</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span> <span class="c1">// or highlightTouch(null) for callback to onNothingSelected(...)</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onChartLongPressed</span><span class="o">(</span><span class="nc">MotionEvent</span> <span class="n">me</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onChartDoubleTapped</span><span class="o">(</span><span class="nc">MotionEvent</span> <span class="n">me</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onChartSingleTapped</span><span class="o">(</span><span class="nc">MotionEvent</span> <span class="n">me</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onChartFling</span><span class="o">(</span><span class="nc">MotionEvent</span> <span class="n">me1</span><span class="o">,</span> <span class="nc">MotionEvent</span> <span class="n">me2</span><span class="o">,</span> <span class="kt">float</span> <span class="n">velocityX</span><span class="o">,</span> <span class="kt">float</span> <span class="n">velocityY</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onChartScale</span><span class="o">(</span><span class="nc">MotionEvent</span> <span class="n">me</span><span class="o">,</span> <span class="kt">float</span> <span class="n">scaleX</span><span class="o">,</span> <span class="kt">float</span> <span class="n">scaleY</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onChartTranslate</span><span class="o">(</span><span class="nc">MotionEvent</span> <span class="n">me</span><span class="o">,</span> <span class="kt">float</span> <span class="n">dX</span><span class="o">,</span> <span class="kt">float</span> <span class="n">dY</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onValueSelected</span><span class="o">(</span><span class="nc">Entry</span> <span class="n">e</span><span class="o">,</span> <span class="nc">Highlight</span> <span class="n">h</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onNothingSelected</span><span class="o">()</span> <span class="o">{</span>
+
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>结果示意</p>
+
+<p><img src="https://img-blog.csdn.net/20180115202200341?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQva2V3ZWkxNjg=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="" /></p>
+
+<p>本文<a href="http://download.csdn.net/download/kewei168/10206920">源码</a></p>
+:ET

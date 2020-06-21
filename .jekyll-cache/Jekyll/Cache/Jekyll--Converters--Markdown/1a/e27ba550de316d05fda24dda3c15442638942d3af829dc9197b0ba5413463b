@@ -1,0 +1,55 @@
+I"y
+<p>  我们可能经常会遇到这样的情况，需要将别人发过来的word文档转为pdf格式，数量少的时候一个个打开另存为即可，但是有时候动不动十几个文件，一个个弄就太麻烦了，最近也遇到了这样的问题，与大家分享一下</p>
+
+<hr />
+
+<p>环境准备：</p>
+
+<ul>
+  <li>python3</li>
+  <li>office2007及以上</li>
+</ul>
+
+<p>关键函数：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#doc --&gt; pdf
+</span><span class="k">def</span> <span class="nf">doc2pdf</span><span class="p">(</span><span class="n">input_file</span><span class="p">):</span>
+    <span class="n">word</span> <span class="o">=</span> <span class="n">Dispatch</span><span class="p">(</span><span class="s">'Word.Application'</span><span class="p">)</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">word</span><span class="p">.</span><span class="n">Documents</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span><span class="n">input_file</span><span class="p">)</span>
+    <span class="n">doc</span><span class="p">.</span><span class="n">SaveAs</span><span class="p">(</span><span class="n">input_file</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">".docx"</span><span class="p">,</span> <span class="s">".pdf"</span><span class="p">),</span> <span class="n">FileFormat</span><span class="o">=</span><span class="n">wdFormatPDF</span><span class="p">)</span>
+    <span class="n">doc</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+    <span class="n">word</span><span class="p">.</span><span class="n">Quit</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#recurse a file
+</span><span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">walk</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+</code></pre></div></div>
+
+<p>完整代码如下（遍历整个文件夹，将所有word文件转为pdf）</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">win32com.client</span> <span class="kn">import</span> <span class="n">Dispatch</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">walk</span>
+
+<span class="n">wdFormatPDF</span> <span class="o">=</span> <span class="mi">17</span>
+
+
+<span class="k">def</span> <span class="nf">doc2pdf</span><span class="p">(</span><span class="n">input_file</span><span class="p">):</span>
+    <span class="n">word</span> <span class="o">=</span> <span class="n">Dispatch</span><span class="p">(</span><span class="s">'Word.Application'</span><span class="p">)</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">word</span><span class="p">.</span><span class="n">Documents</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span><span class="n">input_file</span><span class="p">)</span>
+    <span class="n">doc</span><span class="p">.</span><span class="n">SaveAs</span><span class="p">(</span><span class="n">input_file</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">".docx"</span><span class="p">,</span> <span class="s">".pdf"</span><span class="p">),</span> <span class="n">FileFormat</span><span class="o">=</span><span class="n">wdFormatPDF</span><span class="p">)</span>
+    <span class="n">doc</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+    <span class="n">word</span><span class="p">.</span><span class="n">Quit</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">doc_files</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="s">"C:</span><span class="se">\\</span><span class="s">Users</span><span class="se">\\</span><span class="s">xkw</span><span class="se">\\</span><span class="s">Desktop</span><span class="se">\\</span><span class="s">destData"</span>
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">walk</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+        <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">file</span><span class="p">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">".doc"</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">file</span><span class="p">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">".docx"</span><span class="p">):</span>
+                <span class="n">doc2pdf</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">root</span> <span class="o">+</span> <span class="s">"</span><span class="se">\\</span><span class="s">"</span> <span class="o">+</span> <span class="nb">file</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<p><strong>注意</strong>：python3里面没有<strong>win32</strong>这个package，对应的package为<strong>pywin32</strong>，github在<a href="https://github.com/mhammond/pywin32">这里</a></p>
+:ET

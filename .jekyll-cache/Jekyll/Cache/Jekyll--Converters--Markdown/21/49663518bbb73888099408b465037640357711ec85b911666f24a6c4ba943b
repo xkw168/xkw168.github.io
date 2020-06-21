@@ -1,0 +1,121 @@
+I"$0<ul id="markdown-toc">
+  <li><a href="#文章链接" id="markdown-toc-文章链接">文章链接</a></li>
+  <li><a href="#模型原理" id="markdown-toc-模型原理">模型原理</a></li>
+  <li><a href="#模型安装" id="markdown-toc-模型安装">模型安装</a></li>
+  <li><a href="#模型实现" id="markdown-toc-模型实现">模型实现</a>    <ul>
+      <li><a href="#关键参数" id="markdown-toc-关键参数">关键参数</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="文章链接">文章链接</h2>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%B8%80-%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86/">（一）数据预处理</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%BA%8C-AR%E6%A8%A1%E5%9E%8B/">（二）AR模型（自回归模型）</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%B8%89-Xgboost%E6%A8%A1%E5%9E%8B/">（三）Xgboost模型</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E5%9B%9B-LSTM%E6%A8%A1%E5%9E%8B/">（四）LSTM模型</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%BA%94-Prophet%E6%A8%A1%E5%9E%8B/">（五）Prophet模型（自回归模型）</a></p>
+
+<hr />
+
+<h2 id="模型原理">模型原理</h2>
+<p>  Prophet模型，是Facebook公司开源的一个专门用于大规模时间序列分析的模型,基于加性模型（Additive Model），利用年月日等的周期性再加上假期影响去拟合非线性的趋势。具体内容可以在<a href="https://github.com/facebook/prophet">这里</a>找到。该模型最适合用于拟合那些具有较强周期性并且拥有几个周期的数据，并且对缺失值，趋势偏移和异常值都有着较好的支持。Prophet采用一种独特的策略（如图所示），在保证当需要的时候可以完全自动化整个流程的前提下，允许数据分析学家通过一组关键的模型参数和选项来在预测中加入自己的判断。
+<img src="/img/prophet.png" alt="Prophet模型策略" />
+  Prophet原理图Prophet的大致原理如下，它将一个时间序列看成是三部分的组合：趋势，季节和假日。$y(t)=g(t)+s(t)+h(t)+\epsilon_t$。$g(t)$代表趋势项，用于拟合时间序列里面的非周期项；$s(t)$代表周期性变化（如季节性变化）；$h(t)$代表了假期的影响（通常表现为对某些时间点的特殊影响）；误差项$\epsilon_t$代表了所有未被模型考虑到的误差因素。同时该模型将一个预测类问题，映射为了曲线拟合类问题，这天然的就和那些用于分析数据间有依赖性的模型有所不同。尽管这种策略会使其放弃很多常规模型（如ARIMA）的一些优势，但是这种映射带来了一些其他的优势：</p>
+
+<ul>
+  <li>可拓展：曲线拟合问题可以很轻易的引入季节和多周期性的影响，可以应用于多种数据类型；</li>
+  <li>数据灵活：与ARIMA模型不同，曲线拟合问题不需要数据等步长，所以不需要对数据进行一些特殊操作（如插值）；</li>
+  <li>速度快：相比较于传统的训练模型，曲线拟合的速度更快，有助于数据科学家进行迭代；</li>
+  <li>变量易解释：模型的大部分变量都有着明确的物理含义，并且拥有一定数据分析经验的人可以很快的将背景知识转换为新的参数引入模型。</li>
+</ul>
+
+<hr />
+<h2 id="模型安装">模型安装</h2>
+
+<p>Prophet模型的安装推荐使用conda</p>
+
+<p><code class="language-plaintext highlighter-rouge">conda install -c conda-forge fbprophet</code></p>
+
+<p>下载并安装<a href="https://repo.continuum.io/archive/index.html">Anaconda</a>,在cmd/powershell里面输入 <code class="language-plaintext highlighter-rouge">conda</code> 已验证是否成功安装</p>
+<blockquote>
+  <p>如果你对conda不熟悉，下面有一些链接可能会对你有所帮助：</p>
+  <ul>
+    <li><a href="https://blog.csdn.net/wangjian1204/article/details/78508949">在conda中使用pip</a></li>
+    <li><a href="https://zhuanlan.zhihu.com/p/36398337">conda虚拟环境详解</a></li>
+  </ul>
+</blockquote>
+
+<hr />
+
+<h2 id="模型实现">模型实现</h2>
+
+<p>注意：Prophet模型对输入有所限制，接受的是DataFrame格式的输入，并且时间数据列名为ds，观测数据列名为y</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">prophet_predict_fb</span><span class="p">(</span><span class="n">observed_data</span><span class="p">,</span> <span class="n">x_name</span><span class="o">=</span><span class="s">"ds"</span><span class="p">,</span> <span class="n">y_name</span><span class="o">=</span><span class="s">"y"</span><span class="p">,</span> <span class="n">forecast_cnt</span><span class="o">=</span><span class="mi">365</span><span class="p">,</span> <span class="n">frep</span><span class="o">=</span><span class="s">"D"</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s">""</span><span class="p">):</span>
+    <span class="s">"""
+    function that predict time series with library fbprophet
+    :param observed_data: time series data(DataFrame format)
+    (two columns, one is time in YYYY-MM-DD or YYYY-MM-DD HH:MM:SS format and the other is numeric data)
+    :param x_name: x column name(time data), usually is DATE
+    :param y_name: y column name(numeric data) e.g. HMD, MAX...
+    :param forecast_cnt: how many point needed to be predicted
+    :param frep: the frequency/period of prediction
+    :param file_name:
+    :return: None
+    """</span>
+
+    <span class="k">def</span> <span class="nf">check_parameter_validity</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">x_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">observed_data</span><span class="p">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="nb">KeyError</span><span class="p">(</span><span class="s">"train_data doesn't have column named %s"</span> <span class="o">%</span> <span class="n">x_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">observed_data</span><span class="p">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="nb">KeyError</span><span class="p">(</span><span class="s">"train_data doesn't have column named %s"</span> <span class="o">%</span> <span class="n">y_name</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">check_parameter_validity</span><span class="p">()</span>
+    <span class="k">except</span> <span class="nb">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"key error: %s"</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="n">observed_data</span> <span class="o">=</span> <span class="n">observed_data</span><span class="p">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">x_name</span><span class="p">:</span> <span class="s">"ds"</span><span class="p">,</span> <span class="n">y_name</span><span class="p">:</span> <span class="s">"y"</span><span class="p">})</span>
+
+    <span class="n">observed_data</span><span class="p">[</span><span class="s">"ds"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">observed_data</span><span class="p">[</span><span class="s">"ds"</span><span class="p">])</span>
+    <span class="n">observed_data</span><span class="p">[</span><span class="s">"y"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">observed_data</span><span class="p">[</span><span class="s">"y"</span><span class="p">],</span> <span class="n">downcast</span><span class="o">=</span><span class="s">'float'</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s">'coerce'</span><span class="p">)</span>
+
+    <span class="n">df2_pro</span> <span class="o">=</span> <span class="n">fbprophet</span><span class="p">.</span><span class="n">Prophet</span><span class="p">(</span><span class="n">changepoint_prior_scale</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">df2_pro</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">observed_data</span><span class="p">)</span>
+
+    <span class="n">future_date</span> <span class="o">=</span> <span class="n">df2_pro</span><span class="p">.</span><span class="n">make_future_dataframe</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">forecast_cnt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">frep</span><span class="p">)</span>
+    <span class="n">df2_forecast</span> <span class="o">=</span> <span class="n">df2_pro</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">future_date</span><span class="p">)</span>
+
+    <span class="c1"># register a datetime converter for matplotlib
+</span>    <span class="kn">from</span> <span class="nn">pandas.plotting</span> <span class="kn">import</span> <span class="n">register_matplotlib_converters</span>
+    <span class="n">register_matplotlib_converters</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">file_name</span><span class="p">:</span>
+        <span class="n">fig1</span> <span class="o">=</span> <span class="n">df2_pro</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df2_forecast</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="n">x_name</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="n">y_name</span><span class="p">)</span>
+        <span class="n">fig1</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">fig1</span><span class="p">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">'./result/%s.png'</span> <span class="o">%</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="n">fig2</span> <span class="o">=</span> <span class="n">df2_pro</span><span class="p">.</span><span class="n">plot_components</span><span class="p">(</span><span class="n">df2_forecast</span><span class="p">)</span>
+        <span class="n">fig2</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">fig2</span><span class="p">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">'./result/%s.png'</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">file_name</span> <span class="o">+</span> <span class="s">"1"</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">df2_forecast</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="关键参数">关键参数</h3>
+
+<p>该模型封装较好，无需修改较多参数</p>
+
+<ul>
+  <li>changepoint_prior_scale：数据趋势的变化频率，值越大，数据的趋势项变化越缓慢。</li>
+</ul>
+
+<p>注意该模型比较适合于分析周期性较为明显的数据。</p>
+:ET

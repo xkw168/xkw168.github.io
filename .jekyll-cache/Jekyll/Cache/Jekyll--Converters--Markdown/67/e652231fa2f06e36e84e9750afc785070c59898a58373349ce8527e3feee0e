@@ -1,0 +1,32 @@
+I"�
+<ul id="markdown-toc">
+  <li><a href="#chip无法设置字体颜色等属性" id="markdown-toc-chip无法设置字体颜色等属性">chip无法设置字体颜色等属性</a></li>
+</ul>
+
+<h2 id="chip无法设置字体颜色等属性">chip无法设置字体颜色等属性</h2>
+<p>  最近开始接触Material Design，不得不说，Google的这个玩意真的让自己的App瞬间高端大气上档次了（简直就是不会设计的工科狗的福音）</p>
+
+<blockquote>
+  <p>先送上Chip的详细介绍<a href="https://material.io/design/components/chips.html">链接</a></p>
+</blockquote>
+
+<p>  Chip的种类有很多种，但是使用起来大同小异，这里以Action Chip为例<br />
+  仔细看了Chip的介绍会知道Chip本身没有提供TextSize和TextColor这样的属性，那么我们如何设置chip当中字体的一些颜色呢？这里我们采用曲线救国的方法，设置Chip的textAppearance属性，在style.xml文件中创建whiteboldtext（这样一来不仅仅是颜色，常规的字体属性想怎么玩就怎么玩了）</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;style</span> <span class="na">name=</span><span class="s">"WhiteBoldText"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;item</span> <span class="na">name=</span><span class="s">"android:text"</span><span class="nt">&gt;</span>"DONE<span class="nt">&lt;/item&gt;</span>
+        <span class="nt">&lt;item</span> <span class="na">name=</span><span class="s">"android:textSize"</span><span class="nt">&gt;</span>@dimen/shortcut_detail_text_size_normal<span class="nt">&lt;/item&gt;</span>
+        <span class="nt">&lt;item</span> <span class="na">name=</span><span class="s">"android:textColor"</span><span class="nt">&gt;</span>@color/text_white_high<span class="nt">&lt;/item&gt;</span>
+<span class="nt">&lt;/style&gt;</span>
+</code></pre></div></div>
+
+<p>  然后Chip的TextAppearance属性引用这个style</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;android.support.design.chip.Chip</span>
+        <span class="na">android:id=</span><span class="s">"@+id/button_done"</span>
+        <span class="na">android:layout_width=</span><span class="s">"wrap_content"</span>
+        <span class="na">android:layout_height=</span><span class="s">"wrap_content"</span>
+        <span class="na">android:textAppearance=</span><span class="s">"@style/WhiteBoldText"</span>
+        <span class="na">android:backgroundTint=</span><span class="s">"@color/primary_900"</span><span class="nt">/&gt;</span>
+</code></pre></div></div>
+:ET

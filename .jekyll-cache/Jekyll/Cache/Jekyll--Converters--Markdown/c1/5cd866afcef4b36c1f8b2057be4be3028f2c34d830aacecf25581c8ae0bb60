@@ -1,0 +1,339 @@
+I"��<ul id="markdown-toc">
+  <li><a href="#数据预处理pre-processing" id="markdown-toc-数据预处理pre-processing">数据预处理（pre-processing）</a></li>
+  <li><a href="#1-归一化反归一化" id="markdown-toc-1-归一化反归一化">1. 归一化（反归一化）</a></li>
+  <li><a href="#2重采样" id="markdown-toc-2重采样">2.重采样</a></li>
+  <li><a href="#3数据划分" id="markdown-toc-3数据划分">3.数据划分</a></li>
+  <li><a href="#4各种滤波中值均值巴特沃斯" id="markdown-toc-4各种滤波中值均值巴特沃斯">4.各种滤波（中值，均值，巴特沃斯）</a></li>
+  <li><a href="#5数据可视化" id="markdown-toc-5数据可视化">5.数据可视化</a></li>
+  <li><a href="#模型结果衡量" id="markdown-toc-模型结果衡量">模型结果衡量</a></li>
+</ul>
+
+<p>  最近在做时间序列的预测问题，这里就稍微总结回顾一下，便于以后查阅，也希望能给大家提供到帮助，有什么问题欢迎多多交流。<br />
+  这是一个系列的文章，主要从代码的角度分析问题（争取做到代码片段的随用随取），不涉及太多的模型原理（我会尽可能讲一下自己的理解），本系列文章包含了数据预处理和基本时间序列分析预测模型：</p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%B8%80-%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86/">（一）数据预处理</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%BA%8C-AR%E6%A8%A1%E5%9E%8B/">（二）AR模型（自回归模型）</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%B8%89-Xgboost%E6%A8%A1%E5%9E%8B/">（三）Xgboost模型</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E5%9B%9B-LSTM%E6%A8%A1%E5%9E%8B/">（四）LSTM模型</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%BA%94-Prophet%E6%A8%A1%E5%9E%8B/">（五）Prophet模型（自回归模型）</a></p>
+
+<hr />
+
+<h2 id="数据预处理pre-processing">数据预处理（pre-processing）</h2>
+
+<p>数据预处理在数据分析中占据了重要的地位，这里主要介绍几种常见的预处理方法</p>
+
+<h2 id="1-归一化反归一化">1. 归一化（反归一化）</h2>
+
+<p>  归一化可以说是数据预处理里面最常用的方法之一了，在模型训练中不同的数据取值范围假如相差过大很容易造成模型错误的分配权重，所以很多时候归一化必不可少。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">"MinMax"</span><span class="p">,</span> <span class="n">feature_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
+    <span class="s">"""
+    normalize the data
+    :param data: list of data
+    :param method: support MinMax scaler or Z-Score scaler
+    :param feature_range: use in MinMax scaler
+    :return: normalized data(list), scaler
+    """</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">data</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># reshape(-1, 1) --&gt; reshape to a one column n rows matrix(-1 means not sure how many row)
+</span>        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s">"MinMax"</span><span class="p">:</span>
+        <span class="n">scaler</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">(</span><span class="n">feature_range</span><span class="o">=</span><span class="n">feature_range</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s">"Z-Score"</span><span class="p">:</span>
+        <span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">"only support MinMax scaler and Z-Score scaler"</span><span class="p">)</span>
+    <span class="n">scaler</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="c1"># scaler transform apply to each column respectively
+</span>    <span class="c1"># (which means that if we want to transform a 1-D data, we must reshape it to n x 1 matrix)
+</span>    <span class="k">return</span> <span class="n">scaler</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">scaler</span>
+
+
+<span class="k">def</span> <span class="nf">denormalize</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scaler</span><span class="p">):</span>
+    <span class="s">"""
+    denormalize data by scaler
+    :param data:
+    :param scaler:
+    :return: denormalized data
+    """</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">data</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># max, min, mean, variance are all store in scaler, so we need it to perform inverse transform
+</span>    <span class="k">return</span> <span class="n">scaler</span><span class="p">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="2重采样">2.重采样</h2>
+
+<p>  有时候原始数据的采样频率可能太高，导致噪声比较大，重采样可以在一定程度上降低噪声，同时数据量较大的时候还可以起到减小数据量提高模型的迭代速度。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">resample</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s">"W"</span><span class="p">):</span>
+    <span class="s">"""
+    resample the original data to reduce noise
+    :param data:
+    :param period: the period of data e.g. B - business day, D - calendar day, W - weekly, Y - yearly etc.
+    (reference: pandas DateOffset Objects'http://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html')
+    :return:
+    """</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">pd</span><span class="p">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">'ds'</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">.</span><span class="n">resample</span><span class="p">(</span><span class="n">period</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"right"</span><span class="p">).</span><span class="n">mean</span><span class="p">().</span><span class="n">reset_index</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="3数据划分">3.数据划分</h2>
+
+<p>  用于将原始数据划分为训练机，测试集和验证集，可以自行调整分配权重。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">split_data</span><span class="p">(</span><span class="n">observed_data</span><span class="p">,</span> <span class="n">split_ratio</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
+    <span class="s">"""
+    split the observed data into train-evaluation-test three part
+    :param observed_data:
+    :param split_ratio: relative proportion among train,evaluation,test
+    :return: train, evaluation, test data
+    """</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">split_ratio</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">split_ratio</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">split_ratio</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">observed_data</span><span class="p">)</span>
+    <span class="n">train_cnt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">split_ratio</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">total</span><span class="p">)</span> <span class="o">*</span> <span class="n">length</span><span class="p">)</span>
+    <span class="n">test_cnt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">split_ratio</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">total</span><span class="p">)</span> <span class="o">*</span> <span class="n">length</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">observed_data</span><span class="p">[:</span><span class="n">train_cnt</span><span class="p">],</span> <span class="n">observed_data</span><span class="p">[</span><span class="n">train_cnt</span><span class="p">:</span><span class="o">-</span><span class="n">test_cnt</span><span class="p">],</span> <span class="n">observed_data</span><span class="p">[</span><span class="o">-</span><span class="n">test_cnt</span><span class="p">:]</span>
+</code></pre></div></div>
+
+<h2 id="4各种滤波中值均值巴特沃斯">4.各种滤波（中值，均值，巴特沃斯）</h2>
+
+<p>  这个主要用于信号处理，一般的数据分析可能用的不多。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">median_filter</span><span class="p">(</span><span class="n">datas</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="s">"""
+    median filter, length must be odd number
+    :param datas:
+    :param length:
+    :return:
+    """</span>
+    <span class="k">return</span> <span class="n">signal</span><span class="p">.</span><span class="n">medfilt</span><span class="p">(</span><span class="n">datas</span><span class="p">,</span> <span class="n">length</span><span class="p">).</span><span class="n">tolist</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">average_filter</span><span class="p">(</span><span class="n">datas</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="s">"""
+    average filter, length should not greater than 5
+    :param datas:
+    :param length:
+    :return:
+    """</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datas</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">datas</span> <span class="o">=</span> <span class="n">datas</span><span class="p">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">updated</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">length</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">datas</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">datas</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="n">updated</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">average</span><span class="p">([</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">]))</span>
+    <span class="k">elif</span> <span class="n">length</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">datas</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">datas</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">datas</span><span class="p">[</span><span class="mi">2</span><span class="p">:]):</span>
+            <span class="n">updated</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">average</span><span class="p">([</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">]))</span>
+    <span class="k">elif</span> <span class="n">length</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">d4</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">datas</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">],</span> <span class="n">datas</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">datas</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">datas</span><span class="p">[</span><span class="mi">3</span><span class="p">:]):</span>
+            <span class="n">updated</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">average</span><span class="p">([</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">d4</span><span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">d4</span><span class="p">,</span> <span class="n">d5</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">datas</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span> <span class="n">datas</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">],</span> <span class="n">datas</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">datas</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">datas</span><span class="p">[</span><span class="mi">4</span><span class="p">:]):</span>
+            <span class="n">updated</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">average</span><span class="p">([</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">d4</span><span class="p">,</span> <span class="n">d5</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">updated</span>
+
+
+<span class="c1"># noinspection PyTupleAssignmentBalance
+</span><span class="k">def</span> <span class="nf">butter_filter</span><span class="p">(</span><span class="n">datas</span><span class="p">,</span> <span class="n">hc</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="p">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">hc</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="s">"low"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">signal</span><span class="p">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">datas</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="5数据可视化">5.数据可视化</h2>
+
+<p>  数据可视化也是预处理中很重要的一个手段，可以用于分析数据的各项属性。</p>
+
+<ul>
+  <li>折线图：用于分析数据的变化趋势</li>
+  <li>箱型图：用于分析数据异常值</li>
+  <li>正态分布图：用于分析数据是否符合正态分布</li>
+  <li>散点图：用于分析数据的分布情况（线性度，聚合度等）</li>
+  <li>热力图：用于分析多组数据间的相关系数（注意，一定是多组数据）</li>
+  <li>柱状图：用于分析数据的相对大小/占比</li>
+  <li>饼状图：用于分析数据的占比</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">plot_data</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">x_val</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="s">""</span><span class="p">,</span> <span class="n">x_label</span><span class="o">=</span><span class="s">""</span><span class="p">,</span> <span class="n">y_label</span><span class="o">=</span><span class="s">""</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">""</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s">""</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">x_val</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">x_val</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_val</span><span class="p">))</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">legend</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">legend</span><span class="p">:</span>
+        <span class="c1"># show legend(line label)
+</span>        <span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="c1"># show x label
+</span>    <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">x_label</span><span class="p">)</span>
+    <span class="c1"># show y label
+</span>    <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">y_label</span><span class="p">)</span>
+    <span class="c1"># show title
+</span>    <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">file_name</span><span class="p">:</span>
+        <span class="n">plt</span><span class="p">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">'./result/%s.png'</span> <span class="o">%</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s">'tight'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">box_plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s">""</span><span class="p">):</span>
+    <span class="s">"""
+    box plot —— use to see the distribution of the datas
+    :param data: list of data
+    :param file_name: file name of the plot figure
+    :return: None
+    """</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">sym</span><span class="o">=</span><span class="s">"o"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">file_name</span><span class="p">:</span>
+        <span class="n">plt</span><span class="p">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">'./result/%s.png'</span> <span class="o">%</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s">'tight'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">distribution_plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s">""</span><span class="p">):</span>
+    <span class="s">"""
+    distribution plot —— use to see the distribution of the data
+    :param data: list of data
+    :param file_name: file name of the plot figure
+    :return: None
+    """</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">sns</span><span class="p">.</span><span class="n">set_style</span><span class="p">(</span><span class="s">'whitegrid'</span><span class="p">)</span>
+    <span class="n">sns</span><span class="p">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">rug</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'b'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">"distribution"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">file_name</span><span class="p">:</span>
+        <span class="n">plt</span><span class="p">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">"./result/%s.png"</span> <span class="o">%</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s">'tight'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">scatter_plot</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">x_val</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">x_label</span><span class="o">=</span><span class="s">""</span><span class="p">,</span> <span class="n">y_label</span><span class="o">=</span><span class="s">""</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">""</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s">""</span><span class="p">):</span>
+    <span class="s">"""
+    scatter plot —— use to see the distribution of the data
+    :param y_val: y value
+    :param x_val: x value, if None will use 0 ~ range(len(y_val))
+    :param x_label:
+    :param y_label:
+    :param title:
+    :param file_name: file name of the plot figure
+    :return: None
+    """</span>
+    <span class="k">if</span> <span class="n">x_val</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">x_val</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_val</span><span class="p">))</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'o'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'black'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">x_label</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">y_label</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">file_name</span><span class="p">:</span>
+        <span class="n">plt</span><span class="p">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">'./result/%s.png'</span> <span class="o">%</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s">'tight'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">heatmap</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s">""</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">"pearson"</span><span class="p">):</span>
+    <span class="s">"""
+    draw the heat map of sets of data
+    :param data: DataFrame format
+    :param file_name:
+    :param method: method used to calculate the correlation
+                   pearson - range -1 ~ 1(only two variable in perfect linear relation, it will be ±1)
+                   spearman - range -1 ~ 1(it will be ±1 when
+                   the relation between two variable can be described by a monotonic function)
+    reference
+    &lt; 0.1 : no relation
+    0.10 ~ 0.29: weak relation
+    0.30 ~ 0.49: medium relation
+    &gt; 0.5: strong relation
+    :return: None
+    """</span>
+    <span class="n">sns</span><span class="p">.</span><span class="n">heatmap</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">.</span><span class="n">corr</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">),</span>
+        <span class="n">xticklabels</span><span class="o">=</span><span class="n">data</span><span class="p">.</span><span class="n">corr</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">).</span><span class="n">columns</span><span class="p">,</span>
+        <span class="n">yticklabels</span><span class="o">=</span><span class="n">data</span><span class="p">.</span><span class="n">corr</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">).</span><span class="n">columns</span><span class="p">,</span>
+        <span class="n">annot</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">annot_kws</span><span class="o">=</span><span class="p">{</span><span class="s">'weight'</span><span class="p">:</span> <span class="s">'bold'</span><span class="p">},</span>
+        <span class="n">vmin</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">"YlGnBu"</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">file_name</span><span class="p">:</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">"."</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">plt</span><span class="p">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">"./result/heatmap/%s.png"</span> <span class="o">%</span> <span class="n">file_name</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">bar_plot</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">x_val</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">x_label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s">""</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">x_val</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">x_val</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_val</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">x_label</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">x_label</span> <span class="o">=</span> <span class="n">x_val</span>
+    <span class="k">if</span> <span class="n">horizontal</span><span class="p">:</span>
+        <span class="n">plt</span><span class="p">.</span><span class="n">barh</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">x_val</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">y_val</span><span class="p">,</span> <span class="n">tick_label</span><span class="o">=</span><span class="n">x_label</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="n">x_val</span><span class="p">):</span>
+            <span class="n">plt</span><span class="p">.</span><span class="n">text</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="s">'%.0f'</span> <span class="o">%</span> <span class="n">a</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s">'left'</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s">'center'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="p">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x_val</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">y_val</span><span class="p">,</span> <span class="n">tick_label</span><span class="o">=</span><span class="n">x_label</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">):</span>
+            <span class="n">plt</span><span class="p">.</span><span class="n">text</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">,</span> <span class="s">'%.0f'</span> <span class="o">%</span> <span class="n">b</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s">'center'</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s">'bottom'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">'./result/%s.png'</span> <span class="o">%</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s">'tight'</span><span class="p">)</span>
+    <span class="c1"># if file_name:
+</span>    <span class="c1">#     plt.savefig('./result/%s.png' % file_name, bbox_inches='tight')
+</span>    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">pie_plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="s">"""
+    draw data in pie figure
+    :param data:list(pure data) or dict(use keys as labels and values as data)
+    :param labels: None if data is a dict
+    :return:
+    """</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="p">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">labels</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">X</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">"labels should be specify"</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="p">.</span><span class="n">pie</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">autopct</span><span class="o">=</span><span class="s">'%1.2f%%'</span><span class="p">)</span>  <span class="c1"># 画饼图（数据，数据对应的标签，百分数保留两位小数点）
+</span>    <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">"Pie chart"</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="模型结果衡量">模型结果衡量</h2>
+
+<p>  当有多个模型的时候，我们需要有一个指标衡量模型建表现的好坏，针对时间序列（连续），可以选取均方误差（mse）和均方根误差（rmse）。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rmse</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+    <span class="s">"""
+    root-mean-square error
+    :param predictions:
+    :param targets:
+    :return:
+    """</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(((</span><span class="n">predictions</span> <span class="o">-</span> <span class="n">targets</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">).</span><span class="n">mean</span><span class="p">())</span>
+
+
+<span class="k">def</span> <span class="nf">mse</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+    <span class="s">"""
+    mean-square error
+    :param predictions:
+    :param targets:
+    :return:
+    """</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">predictions</span> <span class="o">-</span> <span class="n">targets</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">).</span><span class="n">mean</span><span class="p">()</span>
+</code></pre></div></div>
+:ET

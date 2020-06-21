@@ -1,0 +1,79 @@
+I"	"
+<p>  最近经常干的一件事就是面对几十个的.eml文件，逐个打开并下载附件，今天突发奇想，人生苦短，快用python，那么为啥这种重复性的工作不用python替代呢，说干就干
+环境配置</p>
+
+<ul>
+  <li>python3（<code class="language-plaintext highlighter-rouge">pip install email</code>)</li>
+</ul>
+
+<p>关键函数：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">download_attachment</span><span class="p">(</span><span class="n">mailname</span><span class="p">,</span> <span class="n">datapath</span><span class="p">):</span>
+    <span class="s">"""
+    download the attachment of .eml file
+    :param mailname: path of .eml path
+    :param datapath: path of the attachment file
+    :return: None
+    """</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">mailname</span><span class="p">,</span> <span class="s">"r"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">'gbk'</span><span class="p">)</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">email</span><span class="p">.</span><span class="n">message_from_file</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">par</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">.</span><span class="n">walk</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">par</span><span class="p">.</span><span class="n">is_multipart</span><span class="p">():</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">par</span><span class="p">.</span><span class="n">get_param</span><span class="p">(</span><span class="s">"name"</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="n">email</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+                <span class="n">data</span> <span class="o">=</span> <span class="n">par</span><span class="p">.</span><span class="n">get_payload</span><span class="p">(</span><span class="n">decode</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+                <span class="n">data_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">h</span><span class="p">).</span><span class="n">replace</span><span class="p">(</span><span class="s">'/'</span><span class="p">,</span> <span class="s">'_'</span><span class="p">)</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">datapath</span> <span class="o">+</span> <span class="s">'</span><span class="se">\\</span><span class="s">'</span> <span class="o">+</span> <span class="n">data_name</span><span class="p">,</span> <span class="s">'wb'</span><span class="p">)</span>
+                <span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">f</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>完整代码(下载整个文件夹里面所有.eml文件的附件)：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">email</span>
+
+
+<span class="k">def</span> <span class="nf">download_attachment</span><span class="p">(</span><span class="n">mailname</span><span class="p">,</span> <span class="n">datapath</span><span class="p">):</span>
+    <span class="s">"""
+    download the attachment of .eml file
+    :param mailname: path of .eml path
+    :param datapath: path of the attachment file
+    :return: None
+    """</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">mailname</span><span class="p">,</span> <span class="s">"r"</span><span class="p">)</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">email</span><span class="p">.</span><span class="n">message_from_file</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">par</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">.</span><span class="n">walk</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">par</span><span class="p">.</span><span class="n">is_multipart</span><span class="p">():</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">par</span><span class="p">.</span><span class="n">get_param</span><span class="p">(</span><span class="s">"name"</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="n">email</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+                <span class="n">data</span> <span class="o">=</span> <span class="n">par</span><span class="p">.</span><span class="n">get_payload</span><span class="p">(</span><span class="n">decode</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+                <span class="n">data_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">h</span><span class="p">).</span><span class="n">replace</span><span class="p">(</span><span class="s">'/'</span><span class="p">,</span> <span class="s">'_'</span><span class="p">)</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">datapath</span> <span class="o">+</span> <span class="s">'</span><span class="se">\\</span><span class="s">'</span> <span class="o">+</span> <span class="n">data_name</span><span class="p">,</span> <span class="s">'wb'</span><span class="p">)</span>
+                <span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">f</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="nb">dir</span> <span class="o">=</span> <span class="s">"C:</span><span class="se">\\</span><span class="s">Users</span><span class="se">\\</span><span class="s">xkw</span><span class="se">\\</span><span class="s">Desktop</span><span class="se">\\</span><span class="s">srcData</span><span class="se">\\</span><span class="s">"</span>
+    <span class="n">datapath</span> <span class="o">=</span> <span class="s">"C:</span><span class="se">\\</span><span class="s">Users</span><span class="se">\\</span><span class="s">xkw</span><span class="se">\\</span><span class="s">Desktop</span><span class="se">\\</span><span class="s">destData"</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="p">.</span><span class="n">listdir</span><span class="p">(</span><span class="nb">dir</span><span class="p">):</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="nb">dir</span> <span class="o">+</span> <span class="n">filename</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">download_attachment</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">datapath</span><span class="p">)</span>
+</code></pre></div></div>
+:ET

@@ -1,0 +1,158 @@
+I"eE<ul id="markdown-toc">
+  <li><a href="#文章链接" id="markdown-toc-文章链接">文章链接</a></li>
+  <li><a href="#模型原理" id="markdown-toc-模型原理">模型原理</a></li>
+  <li><a href="#模型安装" id="markdown-toc-模型安装">模型安装</a></li>
+  <li><a href="#模型实现" id="markdown-toc-模型实现">模型实现</a>    <ul>
+      <li><a href="#关键参数" id="markdown-toc-关键参数">关键参数</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="文章链接">文章链接</h2>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%B8%80-%E6%95%B0%E6%8D%AE%E9%A2%84%E5%A4%84%E7%90%86/">（一）数据预处理</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%BA%8C-AR%E6%A8%A1%E5%9E%8B/">（二）AR模型（自回归模型）</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%B8%89-Xgboost%E6%A8%A1%E5%9E%8B/">（三）Xgboost模型</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E5%9B%9B-LSTM%E6%A8%A1%E5%9E%8B/">（四）LSTM模型</a></p>
+
+<p><a href="https://xkw168.github.io/2019/05/20/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B-%E4%BA%94-Prophet%E6%A8%A1%E5%9E%8B/">（五）Prophet模型（自回归模型）</a></p>
+
+<hr />
+
+<h2 id="模型原理">模型原理</h2>
+<p>  Xgboost（Extreme Gradient Boost）模型，是一种特殊的梯度提升决策树（GBDT，Gradient Boosting Decision Tree），只不过是力求将速度和效率发挥到了极致，故叫X（Extreme）gradientboost。Xgboost其本质上还是基于树结构并结合集成学习的一种方法，其基础树结构为分类回归树（CART，Classification and Regression Tree）。类似于局部加权线性回归算法，基于树的回归算法也是一类局部的回归算法，通过将数据集切分成多份，在每一份数据上单独建模。但不同的是基于树的回归算法是一种基于参数的学习算法，利用训练数据训练完模型后，参数一旦确定，无需再改变。分类回归树是一种基于决策树的结构，既可以用于解决分类问题也可以用于解决回归问题，是国际权威的学术组织The IEEE International Conference on DataMining (ICDM)早前评选出了数据挖掘领域的十大经典算法之一。<br />
+  CART算法核心内容包含以下三个方面：</p>
+
+<ol>
+  <li>二分(Binary Split)：在每次判断过程中，都是对观察变量进行二分。CART算法采用一种二分递归分割的技术，算法总是将当前样本集分割为两个子样本集，使得生成的决策树的每个非叶结点都只有两个分枝。因此CART算法生成的决策树是结构简洁的二叉树;</li>
+  <li>单变量分割(Split Based on One Variable)：每次最优划分都是针对单个变量;</li>
+  <li>剪枝策略：CART算法的关键点，也是所有基于树（Tree-Based）算法的关键步骤</li>
+</ol>
+
+<p>  决策树的生成就是递归地构建二叉决策树的过程，核心思想为在训练数据集所在的输入空间中，递归地将每个区域划分为两个子区域并决定每个子区域上输出值。划分子区域的标准取决于树的种类，对回归树用平方误差最小化准则，对分类树用基尼指数最小化准则。回归树的生成具体步骤如下：</p>
+
+<ol>
+  <li>选择最优切分变量j与切分点s，求解</li>
+</ol>
+
+\[min[min{\sum_{x_i \in R_1(j,s)} (y_i-c_1)^2} + min{\sum_{x_j \in R_2(j,s)} (y_j-c_2)^2}]\]
+
+<p>遍历变量j，对固定的切分变量j扫描切分点s，选择使上式最小值的对$(j; s)$。其中$R_m$是被划分的输入空间，$c_m$是空间$R_m$对应的输出值</p>
+
+<ol>
+  <li>用选定的对$(j; s)$划分区域并决定相应的输出值</li>
+</ol>
+
+\[R_1(j,s)=\{x|x^{(j)} \leq s\}, R_2(j,s)=\{x|x^{(j)} &gt; s\} \\
+\hat{c}_m = \frac{1}{N_m} \sum_{x_i \in R_m(j,s)} y_i, x \in R_m, m = 1,2\]
+
+<ol>
+  <li>继续对两个子区域递归的调用上述步骤，最终将输入空间划分为M个区域$R_1,R_2,…,R_m$，生成决策树</li>
+</ol>
+
+\[f(x) = \sum_{m=1}^{M} \hat{c}_m I(x \in R_m)\]
+
+<ol>
+  <li>当输入空间划分确定时，可以用平方误差来衡量回归树对于训练数据的拟合程度，用平方误差最小的准则不断地递归划分子树，直到平方误差满足需求</li>
+</ol>
+
+\[L(y, f(x)) = \sum_{x_i \in R_m} {(y_i - f(x_i))}^2\]
+
+<p>  单棵分类回归树精度有限，应用场景受限，故Xgboost在CART的基础上引入了集成学习（boosting方法），并采用并行计算等方式极大的加速了模型计算速度。Boosting的核心思想就是所有弱分类器的结果相加等于预测值，然后下一个弱分类器去拟合误差函数对预测值的梯度/残差(这个梯度/残差就是预测值与真实值之间的误差)，从而不断地减小残差，直到满足系统的误差要求（如图所示）
+<img src="/_posts/img/xgboost.png" alt="xgboost示意图" /></p>
+
+<hr />
+
+<h2 id="模型安装">模型安装</h2>
+
+<p><code class="language-plaintext highlighter-rouge">pip install xgboost</code></p>
+
+<hr />
+
+<h2 id="模型实现">模型实现</h2>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">xgboost_predict</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">evaluation_data</span><span class="p">,</span> <span class="n">forecast_cnt</span><span class="o">=</span><span class="mi">365</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s">"D"</span><span class="p">,</span> <span class="n">importance_fig</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">model_dir</span><span class="o">=</span><span class="s">""</span><span class="p">):</span>
+    <span class="s">"""
+    predict time series with XGBoost library which is based on Gradient Boost and CART(classification and regression tree)
+    :param train_data: data use to train the model
+    :param evaluation_data: data use to evaluate the model
+    :param forecast_cnt: how many point needed to be predicted
+    :param freq: the interval between time index
+    :param importance_fig: whether plot importance of each feature
+    :param model_dir: directory of pre-trained model(checkpoint, params)
+    :return:
+    """</span>
+
+    <span class="k">def</span> <span class="nf">create_features</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="s">"""
+        Creates time series features from datetime index
+        """</span>
+        <span class="n">df</span><span class="p">[</span><span class="s">'date'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">index</span>
+        <span class="n">df</span><span class="p">[</span><span class="s">'hour'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'date'</span><span class="p">].</span><span class="n">dt</span><span class="p">.</span><span class="n">hour</span>
+        <span class="n">df</span><span class="p">[</span><span class="s">'dayofweek'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'date'</span><span class="p">].</span><span class="n">dt</span><span class="p">.</span><span class="n">dayofweek</span>
+        <span class="n">df</span><span class="p">[</span><span class="s">'quarter'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'date'</span><span class="p">].</span><span class="n">dt</span><span class="p">.</span><span class="n">quarter</span>
+        <span class="n">df</span><span class="p">[</span><span class="s">'month'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'date'</span><span class="p">].</span><span class="n">dt</span><span class="p">.</span><span class="n">month</span>
+        <span class="n">df</span><span class="p">[</span><span class="s">'year'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'date'</span><span class="p">].</span><span class="n">dt</span><span class="p">.</span><span class="n">year</span>
+        <span class="n">df</span><span class="p">[</span><span class="s">'dayofyear'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'date'</span><span class="p">].</span><span class="n">dt</span><span class="p">.</span><span class="n">dayofyear</span>
+        <span class="n">df</span><span class="p">[</span><span class="s">'dayofmonth'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'date'</span><span class="p">].</span><span class="n">dt</span><span class="p">.</span><span class="n">day</span>
+        <span class="n">df</span><span class="p">[</span><span class="s">'weekofyear'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'date'</span><span class="p">].</span><span class="n">dt</span><span class="p">.</span><span class="n">weekofyear</span>
+
+        <span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s">'hour'</span><span class="p">,</span> <span class="s">'dayofweek'</span><span class="p">,</span> <span class="s">'quarter'</span><span class="p">,</span> <span class="s">'month'</span><span class="p">,</span> <span class="s">'year'</span><span class="p">,</span>
+                <span class="s">'dayofyear'</span><span class="p">,</span> <span class="s">'dayofmonth'</span><span class="p">,</span> <span class="s">'weekofyear'</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">label</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
+        <span class="k">return</span> <span class="n">X</span>
+
+    <span class="n">model_directory</span> <span class="o">=</span> <span class="s">"./model/XGBoost_%s"</span> <span class="o">%</span> <span class="n">now</span><span class="p">()</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+
+    <span class="p">}</span>
+    <span class="c1"># if there is a pre-trained model, use parameters from it
+</span>    <span class="k">if</span> <span class="n">model_dir</span><span class="p">:</span>
+        <span class="n">model_directory</span> <span class="o">=</span> <span class="n">model_dir</span>
+
+    <span class="n">latest_date</span> <span class="o">=</span> <span class="n">evaluation_data</span><span class="p">[</span><span class="s">"ds"</span><span class="p">].</span><span class="n">tolist</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># set index with datetime
+</span>    <span class="n">train_data</span> <span class="o">=</span> <span class="n">train_data</span><span class="p">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">pd</span><span class="p">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="s">"ds"</span><span class="p">]))</span>
+    <span class="n">evaluation_data</span> <span class="o">=</span> <span class="n">evaluation_data</span><span class="p">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">pd</span><span class="p">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">evaluation_data</span><span class="p">[</span><span class="s">"ds"</span><span class="p">]))</span>
+    <span class="n">forecast_data</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">.</span><span class="n">from_dict</span><span class="p">({</span>
+        <span class="s">"ds"</span><span class="p">:</span> <span class="n">generate_time_series</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="n">latest_date</span><span class="p">,</span> <span class="n">cnt</span><span class="o">=</span><span class="n">forecast_cnt</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta_dict</span><span class="p">[</span><span class="n">freq</span><span class="p">])</span>
+    <span class="p">})</span>
+    <span class="n">forecast_data</span> <span class="o">=</span> <span class="n">forecast_data</span><span class="p">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">pd</span><span class="p">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">forecast_data</span><span class="p">[</span><span class="s">"ds"</span><span class="p">]))</span>
+
+    <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">create_features</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'y'</span><span class="p">)</span>
+    <span class="n">x_eval</span><span class="p">,</span> <span class="n">y_eval</span> <span class="o">=</span> <span class="n">create_features</span><span class="p">(</span><span class="n">evaluation_data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"y"</span><span class="p">)</span>
+    <span class="n">x_forecast</span> <span class="o">=</span> <span class="n">create_features</span><span class="p">(</span><span class="n">forecast_data</span><span class="p">)</span>
+
+    <span class="n">reg</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">model_dir</span><span class="p">:</span>
+        <span class="n">reg</span><span class="p">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">model_directory</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">reg</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span>
+                <span class="n">eval_set</span><span class="o">=</span><span class="p">[(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="p">(</span><span class="n">x_eval</span><span class="p">,</span> <span class="n">y_eval</span><span class="p">)],</span>
+                <span class="n">early_stopping_rounds</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>  <span class="c1"># Change verbose to True if you want to see it train
+</span>        <span class="n">reg</span><span class="p">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">model_directory</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">importance_fig</span><span class="p">:</span>
+        <span class="n">plot_importance</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+
+    <span class="n">evaluation_data</span><span class="p">[</span><span class="s">"y"</span><span class="p">]</span> <span class="o">=</span> <span class="n">reg</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_eval</span><span class="p">)</span>
+    <span class="n">forecast_data</span><span class="p">[</span><span class="s">"y"</span><span class="p">]</span> <span class="o">=</span> <span class="n">reg</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_forecast</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">evaluation_data</span><span class="p">,</span> <span class="n">forecast_data</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="关键参数">关键参数</h3>
+
+<ul>
+  <li>early_stopping_rounds：早期停止次数，用于控制模型的迭代次数。假设为50，则模型会在训练到50次内误差基本不变的时候提前结束训练。</li>
+</ul>
+
+<p>注意这里假设只有一个时间序列，实际情况中，可能存在多个序列与待分析的时间序列相关，可以模仿这里的写法将其拓展为多特征分析与预测（这里仅仅用到了时间这一特征）。</p>
+:ET

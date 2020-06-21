@@ -1,0 +1,256 @@
+I"�x<ul id="markdown-toc">
+  <li><a href="#继承自appcompactactivity" id="markdown-toc-继承自appcompactactivity">继承自AppCompactActivity</a></li>
+  <li><a href="#继承自listactivity" id="markdown-toc-继承自listactivity">继承自ListActivity</a></li>
+</ul>
+
+<p>  ListView可以说是我们在进行Android开发时候最常见的控件之一了，那么我们该如何使用呢？这里主要介绍两种方法。</p>
+
+<ol>
+  <li>使用Activity（继承自AppCompactActivity）+ListView控件</li>
+  <li>使用Activity（继承自ListActivity）</li>
+</ol>
+
+<h2 id="继承自appcompactactivity">继承自AppCompactActivity</h2>
+
+<hr />
+
+<p>首先，让我们来看看第一种方法。用一个小例子来介绍一下。</p>
+
+<p>Step1：新建一个工程，修改activity_main.xml的代码如下</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="nt">&lt;android.support.constraint.ConstraintLayout</span> <span class="na">xmlns:android=</span><span class="s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="na">xmlns:app=</span><span class="s">"http://schemas.android.com/apk/res-auto"</span>
+    <span class="na">xmlns:tools=</span><span class="s">"http://schemas.android.com/tools"</span>
+    <span class="na">android:layout_width=</span><span class="s">"match_parent"</span>
+    <span class="na">android:layout_height=</span><span class="s">"match_parent"</span>
+    <span class="na">tools:context=</span><span class="s">"com.example.xkw.listviewtest.MainActivity"</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;ListView</span>
+        <span class="na">android:id=</span><span class="s">"@+id/listview_fruit"</span>
+        <span class="na">app:layout_constraintBottom_toBottomOf=</span><span class="s">"parent"</span>
+        <span class="na">app:layout_constraintEnd_toEndOf=</span><span class="s">"parent"</span>
+        <span class="na">app:layout_constraintStart_toStartOf=</span><span class="s">"parent"</span>
+        <span class="na">app:layout_constraintTop_toTopOf=</span><span class="s">"parent"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/android.support.constraint.ConstraintLayout&gt;</span>
+</code></pre></div></div>
+
+<p>在这里我们只添加了一个ListView的控件，并没有添加其它的东西。</p>
+
+<p>Step2:如图，layout右键-&gt;new-&gt;Layout Source File，新建一个listitem.xml文件。这个listitem就是listview里面的每一个小单元要显示的东西，这里我们只显示一个字符串就只添加一个TextView控件就行。</p>
+
+<p><img src="http://img.blog.csdn.net/20171128225629192?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQva2V3ZWkxNjg=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述" /></p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="nt">&lt;android.support.constraint.ConstraintLayout</span>
+    <span class="na">xmlns:android=</span><span class="s">"http://schemas.android.com/apk/res/android"</span> <span class="na">android:layout_width=</span><span class="s">"match_parent"</span>
+    <span class="na">android:layout_height=</span><span class="s">"match_parent"</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;TextView</span>
+        <span class="na">android:id=</span><span class="s">"@+id/fruit_name"</span>
+        <span class="na">android:layout_width=</span><span class="s">"match_parent"</span>
+        <span class="na">android:layout_height=</span><span class="s">"51dp"</span>
+        <span class="na">android:textSize=</span><span class="s">"24sp"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/android.support.constraint.ConstraintLayout&gt;</span>
+</code></pre></div></div>
+
+<p>Step3：在MainActivity里面修改代码如下</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">com.example.xkw.listviewtest</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">android.support.v7.app.AppCompatActivity</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">android.view.LayoutInflater</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">android.view.View</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">android.view.ViewGroup</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">android.widget.AdapterView</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">android.widget.ArrayAdapter</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">android.widget.BaseAdapter</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">android.widget.ListView</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">android.widget.TextView</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">android.widget.Toast</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="nc">AppCompatActivity</span> <span class="o">{</span>
+
+    <span class="c1">//自己定义的一组用于显示的数据</span>
+    <span class="kd">private</span> <span class="nc">String</span><span class="o">[]</span> <span class="n">fruit</span> <span class="o">=</span>
+<span class="o">{</span><span class="s">"苹果"</span><span class="o">,</span><span class="s">"香蕉"</span><span class="o">,</span><span class="s">"橙子"</span><span class="o">,</span><span class="s">"西瓜"</span><span class="o">,</span><span class="s">"梨"</span><span class="o">,</span><span class="s">"葡萄"</span><span class="o">,</span><span class="s">"菠萝"</span><span class="o">,</span><span class="s">"草莓"</span><span class="o">,</span><span class="s">"芒果"</span><span class="o">,</span><span class="s">"蔓越莓"</span><span class="o">,</span>
+<span class="s">"榴莲"</span><span class="o">,</span><span class="s">"山竹"</span><span class="o">,</span><span class="s">"柚子"</span><span class="o">,</span><span class="s">"哈密瓜"</span><span class="o">,</span><span class="s">"水蜜桃"</span><span class="o">,</span><span class="s">"番石榴"</span><span class="o">,</span><span class="s">"黄桃"</span><span class="o">,</span><span class="s">"蛇果"</span><span class="o">,</span><span class="s">"蜜瓜"</span><span class="o">,</span><span class="s">"蓝莓"</span><span class="o">,</span><span class="s">"甘蔗"</span><span class="o">};</span>
+    <span class="kd">private</span> <span class="nc">FruitAdapter</span> <span class="n">mfruitAdapter</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">ListView</span> <span class="n">mlistView</span><span class="o">;</span>
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="nc">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+        <span class="n">setContentView</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">activity_main</span><span class="o">);</span>
+        <span class="n">mlistView</span> <span class="o">=</span> <span class="o">(</span><span class="nc">ListView</span><span class="o">)</span><span class="n">findViewById</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">listview_fruit</span><span class="o">);</span>
+        <span class="n">mfruitAdapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">FruitAdapter</span><span class="o">();</span>
+        <span class="n">initFruits</span><span class="o">();</span>
+        <span class="n">mlistView</span><span class="o">.</span><span class="na">setAdapter</span><span class="o">(</span><span class="n">mfruitAdapter</span><span class="o">);</span>
+        <span class="n">mlistView</span><span class="o">.</span><span class="na">setOnItemClickListener</span><span class="o">(</span><span class="k">new</span> <span class="nc">AdapterView</span><span class="o">.</span><span class="na">OnItemClickListener</span><span class="o">()</span> <span class="o">{</span>
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onItemClick</span><span class="o">(</span><span class="nc">AdapterView</span><span class="o">&lt;?&gt;</span> <span class="n">adapterView</span><span class="o">,</span> <span class="nc">View</span> <span class="n">view</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">,</span> <span class="kt">long</span> <span class="n">l</span><span class="o">)</span> <span class="o">{</span>
+                <span class="nc">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="nc">MainActivity</span><span class="o">.</span><span class="na">this</span><span class="o">,</span><span class="s">"您选择了："</span> <span class="o">+</span> <span class="o">((</span><span class="nc">Fruit</span><span class="o">)</span> <span class="n">mfruitAdapter</span><span class="o">.</span><span class="na">getItem</span><span class="o">(</span><span class="n">i</span><span class="o">)).</span><span class="na">getName</span><span class="o">(),</span><span class="nc">Toast</span><span class="o">.</span><span class="na">LENGTH_SHORT</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">});</span>
+    <span class="o">}</span>
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">initFruits</span><span class="o">(){</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">fruit</span><span class="o">.</span><span class="na">length</span><span class="o">;</span><span class="n">i</span> <span class="o">++){</span>
+            <span class="nc">Fruit</span> <span class="n">newfruit</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Fruit</span><span class="o">(</span><span class="n">fruit</span><span class="o">[</span><span class="n">i</span><span class="o">]);</span>
+            <span class="n">mfruitAdapter</span><span class="o">.</span><span class="na">addFruit</span><span class="o">(</span><span class="n">newfruit</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">Fruit</span><span class="o">{</span>
+        <span class="c1">//定义了一个水果类</span>
+        <span class="kd">private</span> <span class="nc">String</span> <span class="nc">Name</span><span class="o">;</span>
+        <span class="c1">//private int ImageId; //用于存放水果图片的Id，此处没有</span>
+        <span class="kd">public</span> <span class="nf">Fruit</span><span class="o">(</span><span class="nc">String</span> <span class="n">name</span><span class="o">){</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">Name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getName</span><span class="o">(){</span>
+            <span class="k">return</span> <span class="nc">Name</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">class</span> <span class="nc">FruitAdapter</span> <span class="kd">extends</span> <span class="nc">BaseAdapter</span><span class="o">{</span>
+        <span class="kd">private</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Fruit</span><span class="o">&gt;</span> <span class="n">mFruit</span><span class="o">;</span>
+        <span class="kd">private</span> <span class="nc">LayoutInflater</span> <span class="n">mInflator</span><span class="o">;</span>
+
+        <span class="kd">public</span> <span class="nf">FruitAdapter</span><span class="o">(){</span>
+            <span class="kd">super</span><span class="o">();</span>
+            <span class="n">mFruit</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Fruit</span><span class="o">&gt;();</span>
+            <span class="n">mInflator</span> <span class="o">=</span> <span class="nc">MainActivity</span><span class="o">.</span><span class="na">this</span><span class="o">.</span><span class="na">getLayoutInflater</span><span class="o">();</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addFruit</span><span class="o">(</span><span class="nc">Fruit</span> <span class="n">fruit</span><span class="o">){</span>
+            <span class="n">mFruit</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">fruit</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getCount</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">mFruit</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="nc">Object</span> <span class="nf">getItem</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">mFruit</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">long</span> <span class="nf">getItemId</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">i</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="nc">View</span> <span class="nf">getView</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">,</span> <span class="nc">View</span> <span class="n">view</span><span class="o">,</span> <span class="nc">ViewGroup</span> <span class="n">viewGroup</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">ViewHolder</span> <span class="n">viewHolder</span><span class="o">;</span>
+            <span class="c1">//常规ListView优化代码</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">view</span> <span class="o">==</span> <span class="kc">null</span><span class="o">){</span>
+                <span class="c1">//注意inflate（）的第三个参数必须设置为false，不然会和onCreate函数里面的setContentView冲突</span>
+                <span class="n">view</span> <span class="o">=</span> <span class="n">mInflator</span><span class="o">.</span><span class="na">inflate</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">listitem</span><span class="o">,</span><span class="kc">null</span><span class="o">,</span><span class="kc">false</span><span class="o">);</span>
+                <span class="n">viewHolder</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ViewHolder</span><span class="o">();</span>
+                <span class="n">viewHolder</span><span class="o">.</span><span class="na">fruitName</span> <span class="o">=</span> <span class="o">(</span><span class="nc">TextView</span><span class="o">)</span><span class="n">view</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">fruit_name</span><span class="o">);</span>
+                <span class="n">view</span><span class="o">.</span><span class="na">setTag</span><span class="o">(</span><span class="n">viewHolder</span><span class="o">);</span><span class="c1">//将ViewHolder储存至view内</span>
+            <span class="o">}</span>
+            <span class="k">else</span> <span class="o">{</span>
+                <span class="n">viewHolder</span> <span class="o">=</span> <span class="o">(</span><span class="nc">ViewHolder</span><span class="o">)</span><span class="n">view</span><span class="o">.</span><span class="na">getTag</span><span class="o">();</span><span class="c1">//从view内读取ViewHolder</span>
+            <span class="o">}</span>
+            <span class="nc">Fruit</span> <span class="n">fruit</span> <span class="o">=</span> <span class="n">mFruit</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+            <span class="n">viewHolder</span><span class="o">.</span><span class="na">fruitName</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">fruit</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+            <span class="k">return</span> <span class="n">view</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="kd">class</span> <span class="nc">ViewHolder</span><span class="o">{</span>
+            <span class="c1">//定义了一个内部类ViewHolder用于对每一个水果的信息进行缓存</span>
+            <span class="nc">TextView</span> <span class="n">fruitName</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>  下面我们来详细分析一下这段代码。</p>
+
+<p>  首先先解释一下定义的几个类：</p>
+
+<ul>
+  <li>Fruit类是一个水果类，用于存放每一个水果的相关信息（名字，价钱，图片……这里为了简便只有一个名字）；</li>
+  <li>FruitAdapter类继承于BaseAdapter，是一个自己定义的Adapter；</li>
+  <li>ViewHolder是一个内部类，用于缓存读取到的Fruit类实例的Name变量（这样就不用每一次都用findviewbyid（）去找这个变量）。</li>
+</ul>
+
+<p>  首先，自己预先定义一些用于显示的数据。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="nc">String</span><span class="o">[]</span> <span class="n">fruit</span> <span class="o">=</span>
+<span class="o">{</span><span class="s">"苹果"</span><span class="o">,</span><span class="s">"香蕉"</span><span class="o">,</span><span class="s">"橙子"</span><span class="o">,</span><span class="s">"西瓜"</span><span class="o">,</span><span class="s">"梨"</span><span class="o">,</span><span class="s">"葡萄"</span><span class="o">,</span><span class="s">"菠萝"</span><span class="o">,</span><span class="s">"草莓"</span><span class="o">,</span><span class="s">"芒果"</span><span class="o">,</span><span class="s">"蔓越莓"</span><span class="o">,</span>
+ <span class="s">"榴莲"</span><span class="o">,</span><span class="s">"山竹"</span><span class="o">,</span><span class="s">"柚子"</span><span class="o">,</span><span class="s">"哈密瓜"</span><span class="o">,</span><span class="s">"水蜜桃"</span><span class="o">,</span><span class="s">"番石榴"</span><span class="o">,</span><span class="s">"黄桃"</span><span class="o">,</span><span class="s">"蛇果"</span><span class="o">,</span><span class="s">"蜜瓜"</span><span class="o">,</span><span class="s">"蓝莓"</span><span class="o">,</span><span class="s">"甘蔗"</span><span class="o">};</span>
+</code></pre></div></div>
+
+<p>　  然后，在onCreate（）函数里面绑定ListView控件并设定相应的Adapter即可（Adapter是数据（Data）和界面（UI）之间的桥梁）。总的来说，只需要一下这么几步：绑定控件-&gt;添加数据-&gt;设定Adapter，就可以实现ListView的显示功能了。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">setContentView</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">activity_main</span><span class="o">);</span><span class="c1">//加载布局文件</span>
+<span class="n">mlistView</span> <span class="o">=</span> <span class="o">(</span><span class="nc">ListView</span><span class="o">)</span><span class="n">findViewById</span><span class="o">(</span><span class="no">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">listview_fruit</span><span class="o">);</span><span class="c1">//绑定控件</span>
+<span class="n">mfruitAdapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">FruitAdapter</span><span class="o">();</span><span class="c1">//新建一个Adapter</span>
+<span class="n">initFruits</span><span class="o">();</span><span class="c1">//添加数据</span>
+<span class="n">mlistView</span><span class="o">.</span><span class="na">setAdapter</span><span class="o">(</span><span class="n">mfruitAdapter</span><span class="o">);</span><span class="c1">//设定Adapter</span>
+</code></pre></div></div>
+
+<p>  这么几行代码就已经可以完成显示的功能了，话不多说，直接来看看实际效果图。</p>
+
+<p><img src="http://img.blog.csdn.net/20171128230655692?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQva2V3ZWkxNjg=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述" /></p>
+
+<p>  但是假如一个ListView只有显示的功能未免太过鸡肋，那么就让我们来添加一下点击处理函数。其实很简单，只需要直接调用listview的setOnItemClickListener（）函数即可（参数i就是点击的单元的序号）。如下，我们在里面通过Toast显示用户点击了哪一个水果。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mlistView</span><span class="o">.</span><span class="na">setOnItemClickListener</span><span class="o">(</span><span class="k">new</span> <span class="nc">AdapterView</span><span class="o">.</span><span class="na">OnItemClickListener</span><span class="o">()</span> <span class="o">{</span>
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onItemClick</span><span class="o">(</span><span class="nc">AdapterView</span><span class="o">&lt;?&gt;</span> <span class="n">adapterView</span><span class="o">,</span> <span class="nc">View</span> <span class="n">view</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">,</span> <span class="kt">long</span> <span class="n">l</span><span class="o">)</span> <span class="o">{</span>
+                <span class="nc">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="nc">MainActivity</span><span class="o">.</span><span class="na">this</span><span class="o">,</span><span class="s">"您选择了："</span> <span class="o">+</span> <span class="o">((</span><span class="nc">Fruit</span><span class="o">)</span> <span class="n">mfruitAdapter</span><span class="o">.</span><span class="na">getItem</span><span class="o">(</span><span class="n">i</span><span class="o">)).</span><span class="na">getName</span><span class="o">(),</span><span class="nc">Toast</span><span class="o">.</span><span class="na">LENGTH_SHORT</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">});</span>
+</code></pre></div></div>
+
+<p><img src="http://img.blog.csdn.net/20171128231117510?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQva2V3ZWkxNjg=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述" /></p>
+
+<p>　　至此为止，一个完整的ListView就已经实现了。以上就是介绍的第一种实现ListView的方法。</p>
+
+<h2 id="继承自listactivity">继承自ListActivity</h2>
+
+<hr />
+<p>　　下面介绍第二种实现ListView的方法，就是让这个类继承自ListActivity。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="nc">ListActivity</span> <span class="o">{</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="nc">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+        <span class="c1">//setContentView(R.layout.activity_main)；</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>  然后其他的就和第一种用法差不多了，同样的新建Fruit和FruitAdapter，ViewHolder三个类。需要注意的是，ListActivity是没有布局文件的！！！但是Android Studio默认生成的是继承自AppCompactActivity的活动，在onCreate（）函数里面会加载布局文件，所以假如创建的时候没有注意勾选不要布局文件的话一定要注意把onCreate（）函数里面的setContentView(R.layout.activity_main)；这句话注释掉！！！不然运行会报错。</p>
+
+<p>  介绍一下使用ListActivity相较于第一种方法的几个细微之处。</p>
+
+<ol>
+  <li>ListActivity本身已经定义了点击函数，我们需要做的只是重载一下就好了。</li>
+</ol>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onListItemClick</span><span class="o">(</span><span class="nc">ListView</span> <span class="n">l</span><span class="o">,</span> <span class="nc">View</span> <span class="n">v</span><span class="o">,</span> <span class="kt">int</span> <span class="n">position</span><span class="o">,</span> <span class="kt">long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onListItemClick</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">v</span><span class="o">,</span> <span class="n">position</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+        <span class="nc">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="nc">MainActivity</span><span class="o">.</span><span class="na">this</span><span class="o">,</span><span class="s">"您选择了："</span> <span class="o">+</span> <span class="o">((</span><span class="nc">Fruit</span><span class="o">)</span> <span class="n">mfruitAdapter</span><span class="o">.</span><span class="na">getItem</span><span class="o">(</span><span class="n">position</span><span class="o">)).</span><span class="na">getName</span><span class="o">(),</span><span class="nc">Toast</span><span class="o">.</span><span class="na">LENGTH_SHORT</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+<ol>
+  <li>同样绑定Adapter的函数ListActivity也已经帮我们做好了，我们只需要直接调用就好了。</li>
+</ol>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">setListAdapter</span><span class="o">(</span><span class="n">mfruitAdapter</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>  程序运行之后，可以看到与第一种效果一模一样，具体图在这里就不贴了。</p>
+
+<p><a href="http://download.csdn.net/download/kewei168/10142249">源码下载</a></p>
+
+<hr />
+<p>  ListView的两种实现方法就介绍到这里了。理论上来说用哪种方法都是可以的，看你喜欢用哪种而已。但是个人比较推荐<strong>第一种方法</strong>，使用listview控件，不要继承于ListActivity。因为继承自ListActivity的话是没有布局文件的，能修改的只有默认的ActionBar，但是Google现在已经推出了Material Design，而ActionBar也被更灵活的<strong>ToolBar</strong>所取代，越来越多的应用也开始采用ToolBar的设计方式，但是使用ToolBar需要自己定义布局文件，与ListActivity不能使用布局文件是矛盾的，所以更建议大家使用listview控件。以上纯属个人之愚见，欢迎有不同意见的评论交流。</p>
+:ET

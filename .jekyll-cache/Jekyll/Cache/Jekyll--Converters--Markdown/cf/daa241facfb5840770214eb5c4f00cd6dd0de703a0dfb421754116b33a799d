@@ -1,0 +1,35 @@
+I"�
+<p>  最近有个需求就是给定一个视频，截取某一特定时间的那帧图片。最后决定使用python＋opencv
+环境：</p>
+
+<ul>
+  <li>python3（<code class="language-plaintext highlighter-rouge">pip install opencv-python</code>)</li>
+</ul>
+
+<p>核心代码：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">get_frame_from_video</span><span class="p">(</span><span class="n">video_name</span><span class="p">,</span> <span class="n">frame_time</span><span class="p">,</span> <span class="n">img_dir</span><span class="p">,</span> <span class="n">img_name</span><span class="p">):</span>
+    <span class="s">"""
+    get a specific frame of a video by time in milliseconds
+    :param video_name: video name
+    :param frame_time: time of the desired frame
+    :param img_dir: path which use to store output image
+    :param img_name: name of output image
+    :return: None
+    """</span>
+    <span class="n">vidcap</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">video_name</span><span class="p">)</span>
+    <span class="c1"># Current position of the video file in milliseconds.
+</span>    <span class="n">vidcap</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="n">cv2</span><span class="p">.</span><span class="n">CAP_PROP_POS_MSEC</span><span class="p">,</span> <span class="n">frame_time</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># read(): Grabs, decodes and returns the next video frame
+</span>    <span class="n">success</span><span class="p">,</span> <span class="n">image</span> <span class="o">=</span> <span class="n">vidcap</span><span class="p">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">exists</span><span class="p">(</span><span class="n">img_dir</span><span class="p">):</span>
+        <span class="n">os</span><span class="p">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">img_dir</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+        <span class="c1"># save frame as JPEG file
+</span>        <span class="n">cv2</span><span class="p">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">img_dir</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="n">img_name</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>  
+        <span class="c1"># cv2.imshow("frame%s" % frame_time, image)
+</span>        <span class="c1"># cv2.waitKey()
+</span></code></pre></div></div>
+:ET

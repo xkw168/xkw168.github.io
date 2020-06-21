@@ -1,0 +1,82 @@
+I"�<ul id="markdown-toc">
+  <li><a href="#windows" id="markdown-toc-windows">Windows</a></li>
+  <li><a href="#mac" id="markdown-toc-mac">Mac</a></li>
+  <li><a href="#百度云" id="markdown-toc-百度云">百度云</a></li>
+</ul>
+
+<p>  开一个博客专门记录一下用过的（或者看到的）一些有趣的软件，尽可能的附上了各个软件的下载地址</p>
+
+<h2 id="windows">Windows</h2>
+
+<hr />
+
+<p><a href="https://www.listary.com/">Listary</a></p>
+
+<p>windows平台上面模仿Mac的Spotlight功能，双击ctrl全局搜索文件，堪称windows平台一大神器</p>
+
+<p><a href="https://ccyixia.com/">CC助手</a></p>
+
+<p>全局复制，两次ctrl+c即可将内容复制到CC助手里面，并支持标记等功能</p>
+
+<p><a href="http://www.internetdownloadmanager.com/">IDM</a></p>
+
+<p>windows平台上的一个优质下载器，除了不能支持磁力链接等，普通下载由于其使用了多线程，下载速度十分可观</p>
+
+<h2 id="mac">Mac</h2>
+
+<hr />
+
+<p><a href="https://www.iina.io/">IINA</a></p>
+
+<p>Mac平台上一个开源的播放器，支持N种格式，touchbar的使用，基本可以说是你需要的它都有，强烈安利</p>
+
+<p><a href="https://snip.qq.com/">Snip</a></p>
+
+<p>为了避免截屏需要一直挂着QQ的窘境，腾讯把QQ上面的截图功能单独分离出来，弄了这个应用。至于截屏功能，只能说关于截屏，你想要的他都有，滚动截屏也都支持</p>
+
+<p><a href="https://mac.softpedia.com/get/Graphics/Super-PhotoCut-Pro.shtml">Super PhotoCut Pro</a></p>
+
+<p>想抠图？PS太高大上不会用？这款傻瓜式的抠图软件一定适合你，小白友好的操作，几笔画出需要保留的人物，软件自动帮你扣掉背景（PS：当然由于是自动的，有时候在一些细节的处理上肯定没有人工用PS一点点抠出来效果好，但是已经基本能满足入门级用户的绝大部分抠图需求了）</p>
+
+<p><a href="https://www.smartisan.com/apps/#/handshaker">HandShaker</a></p>
+
+<p>换了Mac之后我一直在寻找一个合适的手机连接电脑的解决方案（苹果用户请直接跳过），这是一款由锤子科技出品的软件，虽然刚安装时看到那个软件的图标默默地吐槽了一波设计师的懒惰，但是打开使用了一下之后，嗯，真香。手机电脑上均需要安装HandShaker，USB线连接后手机会自动弹出提示窗口，按提示连接后，电脑可以管理手机的所有文件，而且传输速度很快~此处称赞一波图片的管理</p>
+
+<p><a href="https://motrix.app/">Motrix</a></p>
+
+<p>Motrix是一款开源免费且界面非常清爽简约的全能型下载软件，它跨平台支持Windows、Mac、Linux三大系统，可以支持下载 HTTP、FTP、BT、磁力链接以及下载百度网盘等（不过经测试百度网盘好像有些链接下载不了，同时部分电影网站的资源Motrix下载不了但是迅雷可以）</p>
+
+<p><a href="https://www.alfredapp.com/">Alfred3</a></p>
+
+<p>Mac自带的Spotlight的升级版（替代品），相比于Spotlight更丰富的功能，适合从小白到极客的全频段用户</p>
+
+<p><a href="https://mediaatelier.com/CheatSheet/">CheatSheet</a></p>
+
+<p>想要更高效的使用一款软件？那肯定离不开快捷键啊，快捷键太多根本记不住？CheatSheet来帮你，打开任意软件，长按command键，一键召唤该软件的所有快捷键</p>
+
+<h2 id="百度云">百度云</h2>
+
+<hr />
+
+<p>尽管百度云本身有诸多槽点，但是不可否认在国内百度云还是有着很大市场占用率。而且由于百度云的限速策略，市面上流传的千奇百怪的百度云破解层出不穷，这里专门单列出来</p>
+
+<p><strong>Windows</strong></p>
+
+<p><a href="http://pandownload.com/">Pandownload</a></p>
+
+<p>Windows平台上很老牌的一个百度网盘下载器（建议使用的时候使用分享链接，下载自己网盘的文件尽可能使用分享下载，避免被百度网盘封号限速），同时pandownload还有<a href="https://www.baiduwp.com/">网页版</a>可供选择</p>
+
+<p><strong>Mac</strong></p>
+
+<p><a href="https://aria2.github.io/">Aria2</a></p>
+
+<p>这里可以详见我另一篇博客<a href="https://xkw168.github.io/2019/03/23/Mac%E7%A0%B4%E8%A7%A3%E7%99%BE%E5%BA%A6%E4%BA%91%E9%99%90%E9%80%9F.html">《Mac破解百度云限速》</a></p>
+
+<p><strong>全平台</strong></p>
+
+<p><a href="https://github.com/b3log/baidu-netdisk-downloaderx?utm_campaign=explore-email&amp;utm_medium=email&amp;utm_source=newsletter&amp;utm_term=daily">BND</a></p>
+
+<p><a href="https://github.com/peterq/pan-light?utm_campaign=explore-email&amp;utm_medium=email&amp;utm_source=newsletter&amp;utm_term=daily">pan-light</a></p>
+
+<p>以上两个都是最近Github上面出现的，暂时还没测试过性能如何</p>
+:ET
