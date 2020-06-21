@@ -1,17 +1,28 @@
+---
+layout: post
+title:  "Django实现迷你淘宝（一）--- PostgreSQL"
+date:   2020-04-01
+categories: 专业学习
+tag: Django
+
+---
+
 最近疫情待在家里，天天就是写作业，写写博客换换脑子，顺便总结一下这段时间所学。
 
 本系列打算分为5部分， 分别是：
-
 1. [postgres安装与入门](https://blog.csdn.net/kewei168/article/details/105446135)
-2. django安装与入门
-3. 使用django内置的验证系统
-4. 使用django的表单简化代码
-5. 使用Bootstrap美化网页
+2. [django安装与入门](https://blog.csdn.net/kewei168/article/details/105446178)
+3. [基于django的用户验证系统实现](https://blog.csdn.net/kewei168/article/details/105446311)
+4. [基于Bootstrap的商品页面设计与美化](https://blog.csdn.net/kewei168/article/details/105852937)
+5. [基于jQuery和AJax的购物车设计与实现](https://blog.csdn.net/kewei168/article/details/106089391)
 
-# Django网页开发(一) --- PostgreSQL
+主要涉及到的内容有：
+* postgres和django简介
+* Bootstrap的基础应用
+* 利用jQuery和AJax让交互更流畅
 
-[toc]
-
+# Django实现迷你淘宝(一) --- PostgreSQL安装与入门
+@[toc]
 ## 1. 安装
 
 linux: `sudo apt install postgresql`
